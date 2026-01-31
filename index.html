@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AURA | PIXEL VOICE ASSISTANT</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Hero Section (Sky) -->
+        <!-- Hero Section (Sky) -->
+        <header class="hero-section">
+            <button id="settingsBtn" class="settings-btn" style="position: absolute; top: 20px; right: 20px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
+            </button>
+            <h1 class="pixel-title">AURA</h1>
+
+            <div class="aura-char-container">
+                <div id="auraBot" class="aura-pixel-bot"></div>
+            </div>
+
+            <button id="micBtn" class="mic-btn-pixel">
+                <!-- Pixel Mic Icon -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    style="image-rendering: pixelated; margin-right: 0.5rem;">
+                    <rect x="9" y="4" width="6" height="10" rx="3" stroke="white" stroke-width="2" />
+                    <path d="M5 12V14C5 17.866 8.13401 21 12 21C15.866 21 19 17.866 19 14V12" stroke="white"
+                        stroke-width="2" />
+                    <path d="M12 21V23" stroke="white" stroke-width="2" />
+                </svg>
+                <!-- Pixel Arrow -->
+                <span style="font-size: 1em; margin-right: 1rem;">▶</span>
+                <span class="btn-text">PRESS TO LISTEN</span>
+            </button>
+        </header>
+
+        <!-- Pixel Transition & Navigation -->
+        <div class="pixel-transition-container">
+            <!-- Random Black Blocks (The "Cityscape") -->
+            <div class="skyline-block" style="height: 40px; left: 0%;"></div>
+            <div class="skyline-block" style="height: 60px; left: 5%;"></div>
+            <div class="skyline-block" style="height: 30px; left: 10%;"></div>
+            <div class="skyline-block pink-block" style="height: 20px; left: 12%; bottom: 60px;"></div>
+            <!-- Pink accent -->
+            <div class="skyline-block" style="height: 80px; left: 15%;"></div>
+            <div class="skyline-block" style="height: 50px; left: 20%;"></div>
+            <div class="skyline-block pink-block" style="height: 30px; left: 21%; bottom: 80px;"></div>
+
+            <div class="skyline-block" style="height: 40px; left: 80%;"></div>
+            <div class="skyline-block" style="height: 70px; left: 85%;"></div>
+            <div class="skyline-block pink-block" style="height: 20px; left: 86%; bottom: 70px;"></div>
+            <div class="skyline-block" style="height: 50px; left: 90%;"></div>
+            <div class="skyline-block" style="height: 30px; left: 95%;"></div>
+
+            <!-- The Pink Nav Bar strip -->
+            <nav class="nav-pixel-strip">
+                <div class="nav-item-strip active" data-tab="interaction">WHO AM I</div>
+                <div class="nav-item-strip" data-tab="skills">SKILLS</div>
+                <div class="nav-item-strip" data-tab="history">HISTORY</div>
+                <div class="nav-item-strip" id="settingsTrigger">SETTINGS</div>
+            </nav>
+        </div>
+
+        <!-- Interaction Section (Black) -->
+        <main class="interaction-section">
+            <!-- Decorative Elements -->
+            <div class="pixel-deco-cross" style="top: 15%; left: 8%;"></div>
+            <div class="pixel-deco-cross" style="bottom: 15%; right: 12%;"></div>
+            <div class="pixel-deco-cross" style="top: 40%; left: 85%;"></div>
+
+            <div class="pixel-deco-square float-1" style="top: 25%; left: 20%;"></div>
+            <div class="pixel-deco-square float-2" style="bottom: 30%; right: 25%; background: var(--earth-green);">
+            </div>
+            <div class="pixel-deco-square" style="top: 10%; right: 5%; background: var(--sky-blue);"></div>
+
+            <div class="pixel-deco-sparkle pulse-slow" style="top: 60%; left: 15%;"></div>
+            <div class="pixel-deco-sparkle" style="top: 20%; right: 35%;"></div>
+            <div class="pixel-deco-sparkle float-1" style="bottom: 40%; left: 5%;"></div>
+
+            <!-- Tab: WHO AM I (Main) -->
+            <div id="interaction" class="content-section active">
+                <h2 class="pixel-section-title">INTERACTION</h2>
+                <div class="grid-container">
+                    <div id="chat-container" class="transcript-area">
+                        <div class="pixel-bubble aura">
+                            HELLO! I AM AURA.<br>PRESS START TO SPEAK.
+                        </div>
+                    </div>
+
+                    <div class="response-area">
+                        <div id="waveContainer" class="pixel-waves">
+                            <div class="pixel-bar"></div>
+                            <div class="pixel-bar"></div>
+                            <div class="pixel-bar"></div>
+                            <div class="pixel-bar"></div>
+                            <div class="pixel-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: SKILLS -->
+            <div id="skills" class="content-section">
+                <h2 class="pixel-section-title">MY SKILLS</h2>
+                <div class="skills-grid">
+                    <div class="skill-card">🗣️ SPEECH TO TEXT</div>
+                    <div class="skill-card">🧠 AI INTELLIGENCE</div>
+                    <div class="skill-card">🔊 TEXT TO SPEECH</div>
+                    <div class="skill-card">👾 RETRO VISUALS</div>
+                </div>
+            </div>
+
+            <!-- Tab: HISTORY -->
+            <div id="history" class="content-section">
+                <h2 class="pixel-section-title">MEMORY LOGS</h2>
+                <div id="history-logs" style="font-family: 'VT323'; color: #888;">
+                    NO LOGS YET...
+                </div>
+            </div>
+
+
+        </main>
+    </div>
+
+    <!-- API Key Modal -->
+    <div id="modalOverlay" class="modal-overlay"
+        style="display: none; position: fixed; inset: 0; align-items: center; justify-content: center; z-index: 100;">
+        <div class="modal">
+            <h2>API CONFIG</h2>
+            <p style="margin-bottom: 1rem;">ENTER OPENAI KEY:</p>
+            <input type="password" id="apiKeyInput" />
+            <button id="saveApiKey" class="save-btn">SAVE</button>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
