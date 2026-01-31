@@ -108,11 +108,14 @@ body {
   background: var(--pixel-black);
   color: var(--pixel-white);
   font-family: 'Press Start 2P', cursive;
-  width: 600px;
+  width: 650px;
+  /* Slightly wider */
   max-width: 90%;
-  padding: 1.5rem 0;
+  padding: 1.8rem 0;
+  /* Taller */
   border: 4px solid var(--pixel-white);
-  box-shadow: 12px 14px 0px 0px var(--pixel-black);
+  box-shadow: 16px 16px 0px 0px var(--pixel-black);
+  /* Deeper solid shadow */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -128,7 +131,7 @@ body {
 
 .mic-btn-pixel:active {
   transform: translate(4px, 4px);
-  box-shadow: 4px 4px 0px var(--pixel-black);
+  box-shadow: 8px 8px 0px var(--pixel-black);
 }
 
 .mic-btn-pixel.active {
@@ -138,7 +141,7 @@ body {
 }
 
 .mic-btn-pixel .btn-text {
-  letter-spacing: 2px;
+  /* Normal spacing for authenticity */
 }
 
 /* --- Pixel Transition Container (Cityscape) --- */
