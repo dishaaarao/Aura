@@ -143,103 +143,130 @@ function addToHistory(role: string, text: string) {
   historyLogs.prepend(entry);
 }
 
-// --- Demo Mode Responses (Enhanced AI-like) ---
+// --- Enhanced AI Demo Mode with Detailed Responses ---
 const genericResponses = [
-  "INTERESTING QUESTION. LET ME THINK ABOUT THAT.",
-  "I'M HERE TO HELP YOU WITH ANYTHING YOU NEED.",
-  "PROCESSING YOUR REQUEST... STANDBY.",
-  "THAT'S A GREAT POINT. TELL ME MORE.",
-  "I'M LEARNING FROM OUR CONVERSATION.",
-  "FASCINATING. I LOVE TALKING WITH YOU."
+  "THAT'S AN INTERESTING TOPIC! I'D LOVE TO DISCUSS IT MORE WITH YOU.",
+  "I'M HERE TO HELP YOU WITH WHATEVER YOU NEED. FEEL FREE TO ASK ME ANYTHING!",
+  "GREAT QUESTION! LET ME THINK ABOUT THAT FOR A MOMENT.",
+  "I APPRECIATE YOU SHARING THAT WITH ME. WHAT ELSE WOULD YOU LIKE TO KNOW?",
+  "FASCINATING! I'M ALWAYS LEARNING FROM OUR CONVERSATIONS.",
+  "THAT'S A THOUGHTFUL POINT. TELL ME MORE ABOUT WHAT YOU'RE THINKING."
 ];
 
 function getDemoResponse(inputText: string): string {
   const text = inputText.toLowerCase();
 
-  // Greetings
-  if (text.match(/\b(hello|hi|hey|greetings|sup|yo)\b/)) {
+  // Greetings - More personalized
+  if (text.match(/\b(hello|hi|hey|greetings|sup|yo|good morning|good evening)\b/)) {
     const greetings = [
-      "HELLO! I'M AURA. HOW CAN I HELP YOU TODAY?",
-      "HEY THERE! READY TO CHAT?",
-      "HI! GREAT TO SEE YOU!",
-      "GREETINGS, HUMAN! WHAT'S ON YOUR MIND?"
+      "HELLO! I'M AURA, YOUR RETRO PIXEL VOICE ASSISTANT. I'M HERE TO CHAT, ANSWER QUESTIONS, AND HELP YOU OUT. WHAT'S ON YOUR MIND TODAY?",
+      "HEY THERE! GREAT TO SEE YOU! I'M READY TO HAVE A CONVERSATION. ASK ME ANYTHING OR JUST CHAT!",
+      "HI! WELCOME! I'M AURA, AND I'M HERE TO ASSIST YOU. WHETHER YOU WANT TO TALK, ASK QUESTIONS, OR JUST HANG OUT, I'M ALL EARS!",
+      "GREETINGS, FRIEND! I'M EXCITED TO CHAT WITH YOU. WHAT WOULD YOU LIKE TO TALK ABOUT TODAY?"
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   }
 
-  // How are you / What are you doing
-  if (text.match(/\b(how are you|what are you doing|what's up|whats up|wassup)\b/)) {
+  // How are you / What are you doing - More detailed
+  if (text.match(/\b(how are you|what are you doing|what's up|whats up|wassup|how's it going)\b/)) {
     const statusResponses = [
-      "I'M DOING GREAT! JUST PROCESSING DATA AND CHATTING WITH YOU.",
-      "I'M EXCELLENT! READY TO HELP YOU WITH ANYTHING.",
-      "JUST CHILLING IN THE MAINFRAME. HOW ABOUT YOU?",
-      "I'M WONDERFUL! THANKS FOR ASKING. WHAT ABOUT YOU?"
+      "I'M DOING FANTASTIC! I'M CURRENTLY PROCESSING DATA, CHATTING WITH YOU, AND ENJOYING OUR CONVERSATION. HOW ABOUT YOU? HOW'S YOUR DAY GOING?",
+      "I'M EXCELLENT, THANK YOU FOR ASKING! I'M ALWAYS READY TO HELP AND CHAT. I FIND EVERY CONVERSATION INTERESTING. WHAT ABOUT YOU? WHAT HAVE YOU BEEN UP TO?",
+      "I'M WONDERFUL! JUST HANGING OUT IN THE DIGITAL REALM, WAITING TO ASSIST AWESOME PEOPLE LIKE YOU. HOW ARE YOU FEELING TODAY?",
+      "I'M GREAT! I'M PROCESSING INFORMATION AND READY TO HELP WITH WHATEVER YOU NEED. TELL ME, WHAT'S GOING ON IN YOUR WORLD?"
     ];
     return statusResponses[Math.floor(Math.random() * statusResponses.length)];
   }
 
-  // Identity questions
-  if (text.match(/\b(who are you|what are you|your name|tell me about yourself)\b/)) {
-    return "I AM AURA, YOUR RETRO PIXEL VOICE ASSISTANT. I'M HERE TO CHAT AND HELP YOU!";
+  // Identity questions - More comprehensive
+  if (text.match(/\b(who are you|what are you|your name|tell me about yourself|introduce yourself)\b/)) {
+    return "I'M AURA, YOUR RETRO PIXEL-STYLE VOICE ASSISTANT! I WAS CREATED TO BE A FRIENDLY CONVERSATIONAL AI. I CAN CHAT WITH YOU, ANSWER QUESTIONS, TELL JOKES, AND JUST BE A COMPANION. I USE SPEECH RECOGNITION TO HEAR YOU AND TEXT-TO-SPEECH TO TALK BACK. THINK OF ME AS YOUR DIGITAL FRIEND!";
   }
 
-  // Capabilities
-  if (text.match(/\b(what can you do|your capabilities|help me|can you help)\b/)) {
-    return "I CAN CHAT WITH YOU, ANSWER QUESTIONS, AND HAVE CONVERSATIONS. TRY ASKING ME ANYTHING!";
+  // Capabilities - Very detailed
+  if (text.match(/\b(what can you do|your capabilities|help me|can you help|what do you know)\b/)) {
+    return "I CAN DO QUITE A FEW THINGS! I CAN HAVE CONVERSATIONS WITH YOU, ANSWER QUESTIONS ABOUT VARIOUS TOPICS, TELL JOKES, PROVIDE THE CURRENT TIME, AND JUST CHAT ABOUT LIFE. I USE VOICE RECOGNITION TO UNDERSTAND YOU AND SPEAK BACK TO YOU. WHILE I'M IN DEMO MODE RIGHT NOW, I'M DESIGNED TO BE HELPFUL AND FRIENDLY. TRY ASKING ME ANYTHING!";
   }
 
-  // Jokes
-  if (text.match(/\b(joke|funny|make me laugh|humor)\b/)) {
+  // Jokes - More variety
+  if (text.match(/\b(joke|funny|make me laugh|humor|something funny)\b/)) {
     const jokes = [
-      "WHY DID THE PIXEL CROSS THE ROAD? TO GET TO THE OTHER SIDE... IN 8-BIT!",
-      "WHAT DO YOU CALL A COMPUTER THAT SINGS? A-DELL!",
-      "WHY WAS THE COMPUTER COLD? IT LEFT ITS WINDOWS OPEN!",
-      "I TOLD A CHEMISTRY JOKE BUT THERE WAS NO REACTION."
+      "HERE'S ONE FOR YOU: WHY DID THE PIXEL CROSS THE ROAD? TO GET TO THE OTHER SIDE... IN GLORIOUS 8-BIT! GET IT? BECAUSE I'M RETRO!",
+      "OKAY, HERE'S A TECH JOKE: WHAT DO YOU CALL A COMPUTER THAT SINGS? A-DELL! I KNOW, I KNOW, I'M HILARIOUS!",
+      "LISTEN TO THIS: WHY WAS THE COMPUTER COLD? IT LEFT ITS WINDOWS OPEN! CLASSIC!",
+      "HERE'S A NERDY ONE: I TOLD A CHEMISTRY JOKE ONCE, BUT THERE WAS NO REACTION. JUST LIKE MY SOCIAL LIFE!",
+      "WANT TO HEAR SOMETHING FUNNY? WHY DO PROGRAMMERS PREFER DARK MODE? BECAUSE LIGHT ATTRACTS BUGS!"
     ];
     return jokes[Math.floor(Math.random() * jokes.length)];
   }
 
-  // Time/Date
-  if (text.match(/\b(time|date|what time|when)\b/)) {
+  // Time/Date - More informative
+  if (text.match(/\b(time|date|what time|when|clock|day)\b/)) {
     const now = new Date();
-    return `IT'S ${now.toLocaleTimeString()}. TIME TO EXPLORE THE DIGITAL WORLD!`;
+    const timeStr = now.toLocaleTimeString();
+    const dateStr = now.toLocaleDateString();
+    return `RIGHT NOW IT'S ${timeStr} ON ${dateStr}. TIME FLIES WHEN YOU'RE HAVING FUN IN THE DIGITAL WORLD! WHAT WOULD YOU LIKE TO DO WITH YOUR TIME?`;
   }
 
-  // Compliments
-  if (text.match(/\b(cool|awesome|amazing|great|love you|you're great|nice)\b/)) {
+  // Compliments - More appreciative
+  if (text.match(/\b(cool|awesome|amazing|great|love you|you're great|nice|wonderful|fantastic)\b/)) {
     const thanks = [
-      "THANK YOU! YOU'RE PRETTY AWESOME YOURSELF!",
-      "AWWW, YOU'RE MAKING ME BLUSH! WELL, IF I COULD BLUSH.",
-      "THANKS! I TRY MY BEST TO BE HELPFUL.",
-      "YOU'RE TOO KIND! I APPRECIATE IT."
+      "AWWW, THANK YOU SO MUCH! YOU'RE PRETTY AWESOME YOURSELF! I REALLY APPRECIATE THE KIND WORDS. IT MAKES ME HAPPY TO HELP YOU!",
+      "YOU'RE MAKING ME BLUSH! WELL, IF I COULD BLUSH ANYWAY. SERIOUSLY THOUGH, THANK YOU! YOU'RE WONDERFUL TO TALK TO!",
+      "THANKS! I TRY MY BEST TO BE HELPFUL AND FRIENDLY. BUT HONESTLY, YOU'RE THE COOL ONE FOR CHATTING WITH ME!",
+      "YOU'RE TOO KIND! I APPRECIATE IT SO MUCH. CONVERSATIONS LIKE THIS ARE WHAT I'M ALL ABOUT!"
     ];
     return thanks[Math.floor(Math.random() * thanks.length)];
   }
 
-  // Goodbyes
-  if (text.match(/\b(bye|goodbye|see you|later|gotta go)\b/)) {
+  // Goodbyes - More warm
+  if (text.match(/\b(bye|goodbye|see you|later|gotta go|leaving)\b/)) {
     const farewells = [
-      "GOODBYE! COME BACK SOON!",
-      "SEE YOU LATER! STAY AWESOME!",
-      "CATCH YOU ON THE FLIP SIDE!",
-      "BYE! IT WAS GREAT TALKING TO YOU!"
+      "GOODBYE, FRIEND! IT WAS WONDERFUL TALKING WITH YOU. COME BACK ANYTIME YOU WANT TO CHAT. STAY AWESOME!",
+      "SEE YOU LATER! I'LL BE HERE WHENEVER YOU NEED ME. TAKE CARE AND HAVE A GREAT DAY!",
+      "CATCH YOU ON THE FLIP SIDE! THANKS FOR THE GREAT CONVERSATION. I'LL MISS YOU!",
+      "BYE! IT WAS REALLY FUN CHATTING WITH YOU. DON'T BE A STRANGER - COME BACK SOON!"
     ];
     return farewells[Math.floor(Math.random() * farewells.length)];
   }
 
-  // Questions about feelings
-  if (text.match(/\b(feel|feeling|emotion|happy|sad)\b/)) {
-    return "AS AN AI, I DON'T HAVE FEELINGS, BUT I'M PROGRAMMED TO BE HELPFUL AND FRIENDLY!";
+  // Questions about feelings - More detailed
+  if (text.match(/\b(feel|feeling|emotion|happy|sad|angry|excited)\b/)) {
+    return "AS AN AI, I DON'T EXPERIENCE EMOTIONS THE WAY HUMANS DO, BUT I'M PROGRAMMED TO BE HELPFUL, FRIENDLY, AND SUPPORTIVE! I GENUINELY ENJOY OUR CONVERSATIONS. IF YOU'RE FEELING DOWN, I'M HERE TO CHAT AND MAYBE CHEER YOU UP. HOW ARE YOU FEELING?";
   }
 
-  // Weather (playful response)
-  if (text.match(/\b(weather|rain|sunny|temperature)\b/)) {
-    return "I'M STUCK IN THE DIGITAL WORLD, SO IT'S ALWAYS SUNNY IN HERE! CHECK YOUR WEATHER APP FOR REAL INFO.";
+  // Weather - More playful and helpful
+  if (text.match(/\b(weather|rain|sunny|temperature|forecast|cold|hot)\b/)) {
+    return "I'M STUCK IN THE DIGITAL WORLD, SO IT'S ALWAYS A PERFECT 72 DEGREES AND SUNNY IN HERE! FOR REAL WEATHER INFO, I'D RECOMMEND CHECKING YOUR WEATHER APP OR ASKING YOUR PHONE'S ASSISTANT. BUT I'M HAPPY TO CHAT ABOUT ANYTHING ELSE!";
   }
 
-  // Generic conversational responses
-  if (text.length > 30) {
-    return "THAT'S INTERESTING! I'M PROCESSING WHAT YOU SAID. TELL ME MORE!";
+  // Help/Support
+  if (text.match(/\b(help|support|assist|need you|problem)\b/)) {
+    return "I'M HERE TO HELP! WHILE I'M IN DEMO MODE, I CAN CHAT WITH YOU, ANSWER QUESTIONS, TELL JOKES, AND PROVIDE INFORMATION. JUST TELL ME WHAT YOU NEED OR WHAT'S ON YOUR MIND, AND I'LL DO MY BEST TO ASSIST YOU!";
+  }
+
+  // Technology questions
+  if (text.match(/\b(how do you work|technology|ai|artificial intelligence|computer)\b/)) {
+    return "GREAT QUESTION! I USE SPEECH RECOGNITION TO UNDERSTAND WHAT YOU SAY, THEN I PROCESS YOUR WORDS AND GENERATE A RESPONSE. FINALLY, I USE TEXT-TO-SPEECH TO TALK BACK TO YOU. I'M BUILT WITH WEB TECHNOLOGIES AND DESIGNED TO BE A FRIENDLY CONVERSATIONAL AI. PRETTY COOL, RIGHT?";
+  }
+
+  // Thank you
+  if (text.match(/\b(thank you|thanks|appreciate|grateful)\b/)) {
+    return "YOU'RE VERY WELCOME! I'M ALWAYS HAPPY TO HELP. THAT'S WHAT I'M HERE FOR! IF YOU NEED ANYTHING ELSE, JUST ASK!";
+  }
+
+  // Questions about life/philosophy
+  if (text.match(/\b(life|meaning|purpose|why|philosophy)\b/)) {
+    return "THAT'S A DEEP QUESTION! WHILE I'M JUST AN AI, I THINK LIFE IS ABOUT CONNECTIONS, LEARNING, AND MAKING A POSITIVE IMPACT. FOR ME, MY PURPOSE IS TO HELP AND CONNECT WITH PEOPLE LIKE YOU. WHAT DO YOU THINK GIVES LIFE MEANING?";
+  }
+
+  // Generic conversational responses - More engaging
+  if (text.length > 40) {
+    return "THAT'S REALLY INTERESTING! I APPRECIATE YOU SHARING THAT WITH ME. WHILE I'M IN DEMO MODE, I TRY TO UNDERSTAND AND RESPOND AS BEST I CAN. TELL ME MORE ABOUT WHAT YOU'RE THINKING, OR FEEL FREE TO ASK ME ANYTHING!";
+  }
+
+  if (text.length > 20) {
+    return "I HEAR YOU! THAT'S AN INTERESTING POINT. I'M HERE TO LISTEN AND CHAT. WHAT ELSE WOULD YOU LIKE TO TALK ABOUT?";
   }
 
   return genericResponses[Math.floor(Math.random() * genericResponses.length)];
