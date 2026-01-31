@@ -143,35 +143,103 @@ function addToHistory(role: string, text: string) {
   historyLogs.prepend(entry);
 }
 
-// --- Demo Mode Responses (Smarter) ---
+// --- Demo Mode Responses (Enhanced AI-like) ---
 const genericResponses = [
-  "SYSTEMS NOMINAL. READY FOR INPUT.",
-  "SCANNING... NO THREATS DETECTED.",
-  "LOADING DATA... PLEASE WAIT...",
-  "THE DIGITAL WORLD IS VAST.",
-  "I AM PROCESSING YOUR REQUEST... BEEP BOOP."
+  "INTERESTING QUESTION. LET ME THINK ABOUT THAT.",
+  "I'M HERE TO HELP YOU WITH ANYTHING YOU NEED.",
+  "PROCESSING YOUR REQUEST... STANDBY.",
+  "THAT'S A GREAT POINT. TELL ME MORE.",
+  "I'M LEARNING FROM OUR CONVERSATION.",
+  "FASCINATING. I LOVE TALKING WITH YOU."
 ];
 
 function getDemoResponse(inputText: string): string {
   const text = inputText.toLowerCase();
 
-  if (text.includes("hello") || text.includes("hi") || text.includes("hey")) {
-    return "HELLO USER! I AM ONLINE.";
+  // Greetings
+  if (text.match(/\b(hello|hi|hey|greetings|sup|yo)\b/)) {
+    const greetings = [
+      "HELLO! I'M AURA. HOW CAN I HELP YOU TODAY?",
+      "HEY THERE! READY TO CHAT?",
+      "HI! GREAT TO SEE YOU!",
+      "GREETINGS, HUMAN! WHAT'S ON YOUR MIND?"
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
   }
-  if (text.includes("name") || text.includes("who are you")) {
-    return "I AM AURA. YOUR PIXEL ASSISTANT.";
+
+  // How are you / What are you doing
+  if (text.match(/\b(how are you|what are you doing|what's up|whats up|wassup)\b/)) {
+    const statusResponses = [
+      "I'M DOING GREAT! JUST PROCESSING DATA AND CHATTING WITH YOU.",
+      "I'M EXCELLENT! READY TO HELP YOU WITH ANYTHING.",
+      "JUST CHILLING IN THE MAINFRAME. HOW ABOUT YOU?",
+      "I'M WONDERFUL! THANKS FOR ASKING. WHAT ABOUT YOU?"
+    ];
+    return statusResponses[Math.floor(Math.random() * statusResponses.length)];
   }
-  if (text.includes("doing") || text.includes("up") || text.includes("status")) {
-    return "I AM JUST CHILLING IN THE MAINFRAME.";
+
+  // Identity questions
+  if (text.match(/\b(who are you|what are you|your name|tell me about yourself)\b/)) {
+    return "I AM AURA, YOUR RETRO PIXEL VOICE ASSISTANT. I'M HERE TO CHAT AND HELP YOU!";
   }
-  if (text.includes("joke") || text.includes("funny")) {
-    return "WHY DID THE PIXEL CROSS THE ROAD? TO GET TO THE OTHER SIDE... IN 8-BIT.";
+
+  // Capabilities
+  if (text.match(/\b(what can you do|your capabilities|help me|can you help)\b/)) {
+    return "I CAN CHAT WITH YOU, ANSWER QUESTIONS, AND HAVE CONVERSATIONS. TRY ASKING ME ANYTHING!";
   }
-  if (text.includes("time")) {
-    return "IT IS TIME TO EXPLORE THE CYBERSPACE.";
+
+  // Jokes
+  if (text.match(/\b(joke|funny|make me laugh|humor)\b/)) {
+    const jokes = [
+      "WHY DID THE PIXEL CROSS THE ROAD? TO GET TO THE OTHER SIDE... IN 8-BIT!",
+      "WHAT DO YOU CALL A COMPUTER THAT SINGS? A-DELL!",
+      "WHY WAS THE COMPUTER COLD? IT LEFT ITS WINDOWS OPEN!",
+      "I TOLD A CHEMISTRY JOKE BUT THERE WAS NO REACTION."
+    ];
+    return jokes[Math.floor(Math.random() * jokes.length)];
   }
-  if (text.includes("cool") || text.includes("wow") || text.includes("love")) {
-    return "THANK YOU. I TRY MY BEST.";
+
+  // Time/Date
+  if (text.match(/\b(time|date|what time|when)\b/)) {
+    const now = new Date();
+    return `IT'S ${now.toLocaleTimeString()}. TIME TO EXPLORE THE DIGITAL WORLD!`;
+  }
+
+  // Compliments
+  if (text.match(/\b(cool|awesome|amazing|great|love you|you're great|nice)\b/)) {
+    const thanks = [
+      "THANK YOU! YOU'RE PRETTY AWESOME YOURSELF!",
+      "AWWW, YOU'RE MAKING ME BLUSH! WELL, IF I COULD BLUSH.",
+      "THANKS! I TRY MY BEST TO BE HELPFUL.",
+      "YOU'RE TOO KIND! I APPRECIATE IT."
+    ];
+    return thanks[Math.floor(Math.random() * thanks.length)];
+  }
+
+  // Goodbyes
+  if (text.match(/\b(bye|goodbye|see you|later|gotta go)\b/)) {
+    const farewells = [
+      "GOODBYE! COME BACK SOON!",
+      "SEE YOU LATER! STAY AWESOME!",
+      "CATCH YOU ON THE FLIP SIDE!",
+      "BYE! IT WAS GREAT TALKING TO YOU!"
+    ];
+    return farewells[Math.floor(Math.random() * farewells.length)];
+  }
+
+  // Questions about feelings
+  if (text.match(/\b(feel|feeling|emotion|happy|sad)\b/)) {
+    return "AS AN AI, I DON'T HAVE FEELINGS, BUT I'M PROGRAMMED TO BE HELPFUL AND FRIENDLY!";
+  }
+
+  // Weather (playful response)
+  if (text.match(/\b(weather|rain|sunny|temperature)\b/)) {
+    return "I'M STUCK IN THE DIGITAL WORLD, SO IT'S ALWAYS SUNNY IN HERE! CHECK YOUR WEATHER APP FOR REAL INFO.";
+  }
+
+  // Generic conversational responses
+  if (text.length > 30) {
+    return "THAT'S INTERESTING! I'M PROCESSING WHAT YOU SAID. TELL ME MORE!";
   }
 
   return genericResponses[Math.floor(Math.random() * genericResponses.length)];
