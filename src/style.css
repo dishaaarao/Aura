@@ -109,19 +109,17 @@ body {
   color: var(--pixel-white);
   font-family: 'Press Start 2P', cursive;
   width: 650px;
-  /* Slightly wider */
   max-width: 90%;
-  padding: 1.8rem 0;
-  /* Taller */
-  border: 4px solid var(--pixel-white);
-  box-shadow: 16px 16px 0px 0px var(--pixel-black);
-  /* Deeper solid shadow */
+  padding: 1.5rem 2rem;
+  border: 8px solid var(--pixel-white);
+  box-shadow: 12px 12px 0px 0px var(--pixel-black);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
   transition: all 0.1s;
   position: relative;
   text-transform: uppercase;
@@ -140,9 +138,7 @@ body {
   color: var(--pixel-black);
 }
 
-.mic-btn-pixel .btn-text {
-  /* Normal spacing for authenticity */
-}
+
 
 /* --- Pixel Transition Container (Cityscape) --- */
 .pixel-transition-container {
@@ -474,13 +470,14 @@ input {
   position: relative;
   background: var(--pixel-white);
   color: var(--pixel-black);
-  padding: 1rem;
+  padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
   font-family: 'VT323', monospace;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   border: 4px solid var(--pixel-black);
   max-width: 80%;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: none;
+  text-transform: lowercase;
 }
 
 .pixel-bubble.user {
@@ -494,6 +491,8 @@ input {
   margin-right: auto;
   background: var(--sky-blue);
   color: var(--pixel-black);
+  border-color: var(--pixel-black);
+  text-transform: uppercase;
 }
 
 /* --- Sections & Navigation --- */
