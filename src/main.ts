@@ -267,17 +267,11 @@ async function handleFinalTranscript(text: string) {
 
   sounds.processing();
 
+  // Always use Demo Mode for now (OpenAI requires valid credits)
   try {
-    let aiResponse: string;
-
-    if (apiKey) {
-      // Real AI Mode
-      aiResponse = await getAIResponse(conversationHistory, apiKey);
-    } else {
-      // Demo Mode (Fake Delay)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      aiResponse = getDemoResponse(text);
-    }
+    // Demo Mode (Fake Delay for realism)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const aiResponse = getDemoResponse(text);
 
     // Remove loading bubble
     const loader = document.getElementById(loadingId);
@@ -292,13 +286,14 @@ async function handleFinalTranscript(text: string) {
     speak(aiResponse);
 
   } catch (error) {
-    // Error handling
+    // Error handling (should rarely happen in demo mode)
     const loader = document.getElementById(loadingId);
     if (loader) loader.remove();
 
     console.error(error);
     sounds.error();
-    addBubble("ERROR: COULD NOT CONNECT TO BRAIN.", 'aura');
+    const errorResponse = "OOPS! SOMETHING WENT WRONG. TRY AGAIN!";
+    addBubble(errorResponse, 'aura');
   }
 }
 
