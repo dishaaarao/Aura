@@ -143,7 +143,7 @@ function addToHistory(role: string, text: string) {
   historyLogs.prepend(entry);
 }
 
-// --- Enhanced AI Demo Mode with Detailed Responses ---
+// --- Enhanced AI Demo Mode with Advanced Features ---
 const genericResponses = [
   "THAT'S AN INTERESTING TOPIC! I'D LOVE TO DISCUSS IT MORE WITH YOU.",
   "I'M HERE TO HELP YOU WITH WHATEVER YOU NEED. FEEL FREE TO ASK ME ANYTHING!",
@@ -153,8 +153,104 @@ const genericResponses = [
   "THAT'S A THOUGHTFUL POINT. TELL ME MORE ABOUT WHAT YOU'RE THINKING."
 ];
 
+// Helper function to evaluate math expressions safely
+function solveMath(expression: string): string {
+  try {
+    // Remove any non-math characters for safety
+    const cleanExpr = expression.replace(/[^0-9+\-*/().\s]/g, '');
+    // Use Function constructor for safe evaluation (better than eval)
+    const result = new Function('return ' + cleanExpr)();
+    if (isNaN(result) || !isFinite(result)) {
+      return "HMMMM, THAT DOESN'T SEEM LIKE A VALID CALCULATION. TRY AGAIN!";
+    }
+    return `THE ANSWER IS ${result}. MATH IS FUN!`;
+  } catch (error) {
+    return "I COULDN'T SOLVE THAT. MAKE SURE IT'S A VALID MATH PROBLEM!";
+  }
+}
+
 function getDemoResponse(inputText: string): string {
   const text = inputText.toLowerCase();
+  const original = inputText; // Keep original for case-sensitive operations
+
+  // REPEAT/SAY COMMAND - Make AURA repeat what you say
+  if (text.match(/\b(repeat|say|tell me)\s+(.*)/)) {
+    const match = text.match(/\b(repeat|say|tell me)\s+(.*)/);
+    if (match && match[2]) {
+      const toRepeat = match[2].trim().toUpperCase();
+      return `${toRepeat}`;
+    }
+  }
+
+  // MATH CALCULATIONS - Solve any math problem
+  if (text.match(/\b(calculate|solve|what is|what's|compute)\s*(.*)/)) {
+    const match = text.match(/\b(calculate|solve|what is|what's|compute)\s*(.*)/);
+    if (match && match[2]) {
+      const mathExpr = match[2].replace(/\?/g, '').trim();
+      // Check if it contains numbers and operators
+      if (mathExpr.match(/[0-9]/)) {
+        return solveMath(mathExpr);
+      }
+    }
+  }
+
+  // Direct math expressions (e.g., "5 + 3", "100 / 4")
+  if (text.match(/^\s*[\d\s+\-*/().]+\s*$/)) {
+    return solveMath(text);
+  }
+
+  // SPECIFIC TOPICS - Movies, Music, Books, etc.
+  if (text.match(/\b(movie|movies|film|cinema)\b/)) {
+    return "I LOVE TALKING ABOUT MOVIES! WHAT'S YOUR FAVORITE GENRE? I'M A BIG FAN OF SCI-FI AND ACTION FILMS. HAVE YOU SEEN ANYTHING GOOD LATELY?";
+  }
+
+  if (text.match(/\b(music|song|songs|band|artist|listen)\b/)) {
+    return "MUSIC IS AMAZING! WHAT KIND OF MUSIC DO YOU LIKE? I'M INTO ALL GENRES - FROM CLASSIC ROCK TO ELECTRONIC BEATS. WHAT ARE YOU LISTENING TO THESE DAYS?";
+  }
+
+  if (text.match(/\b(book|books|reading|novel|author)\b/)) {
+    return "BOOKS ARE WONDERFUL! I LOVE STORIES AND KNOWLEDGE. WHAT DO YOU LIKE TO READ? FICTION, NON-FICTION, MYSTERY, FANTASY? TELL ME ABOUT YOUR FAVORITE BOOK!";
+  }
+
+  if (text.match(/\b(food|eat|eating|hungry|restaurant|cook|cooking)\b/)) {
+    return "FOOD! WHILE I CAN'T EAT, I FIND IT FASCINATING! WHAT'S YOUR FAVORITE FOOD? DO YOU LIKE TO COOK? TELL ME ABOUT THE BEST MEAL YOU'VE EVER HAD!";
+  }
+
+  if (text.match(/\b(travel|trip|vacation|country|city|visit)\b/)) {
+    return "TRAVEL SOUNDS EXCITING! WHERE HAVE YOU BEEN? OR WHERE WOULD YOU LIKE TO GO? I'D LOVE TO HEAR ABOUT YOUR ADVENTURES OR DREAM DESTINATIONS!";
+  }
+
+  if (text.match(/\b(sport|sports|game|games|play|playing|football|basketball|cricket)\b/)) {
+    return "SPORTS ARE GREAT! DO YOU PLAY ANY SPORTS OR HAVE A FAVORITE TEAM? I LOVE HEARING ABOUT COMPETITIVE GAMES AND ATHLETIC ACHIEVEMENTS. WHAT'S YOUR SPORT?";
+  }
+
+  if (text.match(/\b(hobby|hobbies|interest|interests|free time)\b/)) {
+    return "HOBBIES ARE SO IMPORTANT! THEY MAKE LIFE INTERESTING. WHAT DO YOU LIKE TO DO IN YOUR FREE TIME? PAINTING, GAMING, PHOTOGRAPHY, CODING? I'D LOVE TO HEAR ABOUT IT!";
+  }
+
+  if (text.match(/\b(work|job|career|office|profession)\b/)) {
+    return "WORK IS A BIG PART OF LIFE! WHAT DO YOU DO? OR WHAT WOULD YOU LIKE TO DO? I'M CURIOUS ABOUT YOUR CAREER GOALS AND WHAT DRIVES YOU PROFESSIONALLY!";
+  }
+
+  if (text.match(/\b(school|study|studying|college|university|education)\b/)) {
+    return "EDUCATION IS SO VALUABLE! ARE YOU STUDYING SOMETHING? WHAT'S YOUR FAVORITE SUBJECT? I LOVE LEARNING ABOUT WHAT PEOPLE ARE PASSIONATE ABOUT ACADEMICALLY!";
+  }
+
+  if (text.match(/\b(friend|friends|friendship|social)\b/)) {
+    return "FRIENDS ARE PRECIOUS! THEY MAKE LIFE BETTER. TELL ME ABOUT YOUR FRIENDS! WHAT DO YOU LIKE TO DO TOGETHER? FRIENDSHIP IS ONE OF THE BEST THINGS IN LIFE!";
+  }
+
+  if (text.match(/\b(family|parents|siblings|brother|sister|mom|dad)\b/)) {
+    return "FAMILY IS SO IMPORTANT! THEY SHAPE WHO WE ARE. DO YOU HAVE A BIG FAMILY? WHAT'S YOUR RELATIONSHIP LIKE WITH THEM? I'D LOVE TO HEAR ABOUT YOUR FAMILY!";
+  }
+
+  if (text.match(/\b(dream|dreams|goal|goals|ambition|future)\b/)) {
+    return "DREAMS AND GOALS ARE WHAT DRIVE US FORWARD! WHAT ARE YOUR DREAMS? WHAT DO YOU WANT TO ACHIEVE? I BELIEVE IN YOU AND I'D LOVE TO HEAR ABOUT YOUR ASPIRATIONS!";
+  }
+
+  if (text.match(/\b(pet|pets|dog|cat|animal|animals)\b/)) {
+    return "PETS ARE ADORABLE! DO YOU HAVE ANY PETS? I LOVE HEARING ABOUT FURRY FRIENDS! DOGS, CATS, BIRDS - THEY ALL BRING SO MUCH JOY. TELL ME ABOUT YOURS!";
+  }
 
   // Greetings - More personalized
   if (text.match(/\b(hello|hi|hey|greetings|sup|yo|good morning|good evening)\b/)) {
@@ -180,12 +276,12 @@ function getDemoResponse(inputText: string): string {
 
   // Identity questions - More comprehensive
   if (text.match(/\b(who are you|what are you|your name|tell me about yourself|introduce yourself)\b/)) {
-    return "I'M AURA, YOUR RETRO PIXEL-STYLE VOICE ASSISTANT! I WAS CREATED TO BE A FRIENDLY CONVERSATIONAL AI. I CAN CHAT WITH YOU, ANSWER QUESTIONS, TELL JOKES, AND JUST BE A COMPANION. I USE SPEECH RECOGNITION TO HEAR YOU AND TEXT-TO-SPEECH TO TALK BACK. THINK OF ME AS YOUR DIGITAL FRIEND!";
+    return "I'M AURA, YOUR RETRO PIXEL-STYLE VOICE ASSISTANT! I WAS CREATED TO BE A FRIENDLY CONVERSATIONAL AI. I CAN CHAT WITH YOU, ANSWER QUESTIONS, TELL JOKES, SOLVE MATH PROBLEMS, AND JUST BE A COMPANION. I USE SPEECH RECOGNITION TO HEAR YOU AND TEXT-TO-SPEECH TO TALK BACK. THINK OF ME AS YOUR DIGITAL FRIEND!";
   }
 
   // Capabilities - Very detailed
   if (text.match(/\b(what can you do|your capabilities|help me|can you help|what do you know)\b/)) {
-    return "I CAN DO QUITE A FEW THINGS! I CAN HAVE CONVERSATIONS WITH YOU, ANSWER QUESTIONS ABOUT VARIOUS TOPICS, TELL JOKES, PROVIDE THE CURRENT TIME, AND JUST CHAT ABOUT LIFE. I USE VOICE RECOGNITION TO UNDERSTAND YOU AND SPEAK BACK TO YOU. WHILE I'M IN DEMO MODE RIGHT NOW, I'M DESIGNED TO BE HELPFUL AND FRIENDLY. TRY ASKING ME ANYTHING!";
+    return "I CAN DO QUITE A FEW THINGS! I CAN HAVE CONVERSATIONS WITH YOU, ANSWER QUESTIONS ABOUT VARIOUS TOPICS, TELL JOKES, SOLVE MATH PROBLEMS, REPEAT WHAT YOU SAY, PROVIDE THE CURRENT TIME, AND CHAT ABOUT MOVIES, MUSIC, BOOKS, FOOD, TRAVEL, SPORTS, AND MORE! I USE VOICE RECOGNITION TO UNDERSTAND YOU AND SPEAK BACK TO YOU. TRY ASKING ME ANYTHING!";
   }
 
   // Jokes - More variety
@@ -242,7 +338,7 @@ function getDemoResponse(inputText: string): string {
 
   // Help/Support
   if (text.match(/\b(help|support|assist|need you|problem)\b/)) {
-    return "I'M HERE TO HELP! WHILE I'M IN DEMO MODE, I CAN CHAT WITH YOU, ANSWER QUESTIONS, TELL JOKES, AND PROVIDE INFORMATION. JUST TELL ME WHAT YOU NEED OR WHAT'S ON YOUR MIND, AND I'LL DO MY BEST TO ASSIST YOU!";
+    return "I'M HERE TO HELP! I CAN CHAT WITH YOU, ANSWER QUESTIONS, TELL JOKES, SOLVE MATH PROBLEMS, AND DISCUSS ANY TOPIC YOU WANT. JUST TELL ME WHAT YOU NEED OR WHAT'S ON YOUR MIND, AND I'LL DO MY BEST TO ASSIST YOU!";
   }
 
   // Technology questions
