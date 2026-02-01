@@ -67,10 +67,12 @@ navItems.forEach(item => {
 const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 let recognition: SpeechRecognition | null = null;
 
+let isProcessing = false;
+
 if (SpeechRecognitionClass) {
   recognition = new SpeechRecognitionClass() as SpeechRecognition;
   if (recognition) {
-    recognition.continuous = true;
+    recognition.continuous = false; // Revert to false for more predictable restarts
     recognition.interimResults = true;
     recognition.lang = 'en-US';
   }
@@ -78,20 +80,19 @@ if (SpeechRecognitionClass) {
 
 if (recognition) {
   recognition.onresult = (event: any) => {
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      const transcript = event.results[i][0].transcript.toLowerCase();
+    let transcript = '';
+    for (let i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
 
-      // REAL-TIME INTERRUPT: Stop everything if "stop aura" is heard
-      if (transcript.includes('stop aura')) {
-        window.speechSynthesis.cancel();
-        stopListening();
-        addBubble("Aura Stopped.", 'aura');
-        return;
-      }
+    // URGENT INTERRUPT: Check if the word "stop" or "aura" is being said
+    if (transcript.toLowerCase().includes('stop aura')) {
+      stopAll();
+      return;
+    }
 
-      if (event.results[i].isFinal) {
-        handleFinalTranscript(event.results[i][0].transcript);
-      }
+    if (event.results[event.results.length - 1].isFinal) {
+      handleFinalTranscript(event.results[event.results.length - 1][0].transcript);
     }
   };
 
@@ -109,7 +110,14 @@ if (recognition) {
   addBubble("SPEECH NOT SUPPORTED", 'aura');
 }
 
-// --- Functions ---
+function stopAll() {
+  window.speechSynthesis.cancel();
+  isProcessing = false;
+  stopListening();
+  addBubble("STOPPED.", 'aura');
+  sounds.click();
+}
+
 function startListening() {
   if (!recognition) return;
 
@@ -117,10 +125,13 @@ function startListening() {
   sounds.listen();
   micBtn.classList.add('active');
   auraBot.classList.add('listening');
-
   pixelBars.forEach(b => b.classList.add('animate'));
 
-  recognition.start();
+  try {
+    recognition.start();
+  } catch (e) {
+    console.warn('Recognition already started');
+  }
 }
 
 function stopListening() {
@@ -128,7 +139,9 @@ function stopListening() {
   micBtn.classList.remove('active');
   auraBot.classList.remove('listening');
   pixelBars.forEach(b => b.classList.remove('animate'));
-  if (recognition) recognition.stop();
+  try {
+    if (recognition) recognition.stop();
+  } catch (e) { }
 }
 
 function addBubble(text: string, type: 'user' | 'aura') {
@@ -158,10 +171,11 @@ async function handleFinalTranscript(text: string) {
   const lowerText = text.toLowerCase().trim();
 
   if (!lowerText || lowerText === 'stop aura') {
-    window.speechSynthesis.cancel();
+    stopAll();
     return;
   }
 
+  isProcessing = true;
   sounds.click();
   addBubble(text, 'user');
   addToHistory('USER', text);
@@ -188,6 +202,10 @@ async function handleFinalTranscript(text: string) {
     };
 
     const aiResult = await getAIResponse([...conversationHistory, timeContext], apiKey, provider);
+
+    // Check if the user stopped AURA while we were thinking
+    if (!isProcessing) return;
+
     const aiResponse = aiResult.text;
 
     // Remove loading bubble
@@ -201,6 +219,8 @@ async function handleFinalTranscript(text: string) {
     if (aiResult.intent) {
       console.log('Intent Detected:', aiResult.intent);
     }
+
+    if (!isProcessing) return;
 
     sounds.success();
     addBubble(aiResponse, 'aura');
@@ -255,15 +275,15 @@ function speak(text: string) {
   utterance.onstart = () => {
     auraBot.classList.add('listening');
     pixelBars.forEach(b => b.classList.add('animate'));
-    // Ensure mic is active to hear "Stop Aura"
-    if (!isListening) startListening();
+    // Restart mic while she speaks to hear the "stop" command
+    setTimeout(() => {
+      if (!isListening) startListening();
+    }, 100);
   };
 
   utterance.onend = () => {
     auraBot.classList.remove('listening');
     pixelBars.forEach(b => b.classList.remove('animate'));
-    // Turn off mic after she finishes talking
-    stopListening();
   };
 
   window.speechSynthesis.speak(utterance);
@@ -285,7 +305,10 @@ function hideModal() {
 // --- Event Listeners ---
 micBtn.addEventListener('click', () => {
   sounds.click();
-  if (isListening) {
+  // If she is talking or thinking, make the button a STOP button
+  if (window.speechSynthesis.speaking || isProcessing) {
+    stopAll();
+  } else if (isListening) {
     stopListening();
   } else {
     startListening();
