@@ -114,13 +114,24 @@ async function getOpenAIResponse(messages: ChatMessage[], apiKey: string): Promi
 
 function parseAIResponse(raw: string): AIResponse {
     try {
-        const clean = raw.replace(/```json|```/g, '').trim();
-        const parsed = JSON.parse(clean);
-        return {
-            text: (parsed.text || parsed.response || parsed.message || raw).toUpperCase(),
-            intent: parsed.intent || { type: 'conversation' }
-        };
+        // Find if there is a JSON block or object in the response
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            const potentialJson = jsonMatch[0];
+            const cleanJson = potentialJson.replace(/```json|```/g, '').trim();
+            const parsed = JSON.parse(cleanJson);
+            return {
+                text: (parsed.text || parsed.response || parsed.message || raw.replace(potentialJson, '').trim()).toUpperCase(),
+                intent: parsed.intent || { type: 'conversation' }
+            };
+        }
+
+        // If no JSON object found, clean natural language of any accidental code tags
+        const cleanText = raw.replace(/```json|```|\{|\}/g, '').trim();
+        return { text: cleanText.toUpperCase(), intent: { type: 'conversation' } };
     } catch (e) {
-        return { text: raw.toUpperCase(), intent: { type: 'conversation' } };
+        // Fallback: strip everything that looks like JSON and return uppercase text
+        const fallbackText = raw.split('{')[0].trim();
+        return { text: (fallbackText || raw).toUpperCase(), intent: { type: 'conversation' } };
     }
 }
