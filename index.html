@@ -138,10 +138,17 @@
     <div id="modalOverlay" class="modal-overlay"
         style="display: none; position: fixed; inset: 0; align-items: center; justify-content: center; z-index: 100;">
         <div class="modal">
-            <h2>API CONFIG</h2>
-            <p style="margin-bottom: 1rem;">ENTER OPENAI KEY:</p>
-            <input type="password" id="apiKeyInput" />
-            <button id="saveApiKey" class="save-btn">SAVE</button>
+            <h2>AURA CONFIG</h2>
+            <p style="margin-bottom: 0.5rem;">LLM PROVIDER:</p>
+            <select id="providerSelect"
+                style="width: 100%; margin-bottom: 1rem; padding: 0.5rem; border: 4px solid var(--pixel-white); background: #222; color: white; font-family: 'VT323'; font-size: 1.2rem;">
+                <option value="gemini">GOOGLE GEMINI (FREE)</option>
+                <option value="groq">GROQ CLOUD (FREE/FAST)</option>
+                <option value="openai">OPENAI</option>
+            </select>
+            <p style="margin-bottom: 0.5rem;">ENTER API KEY:</p>
+            <input type="password" id="apiKeyInput" style="width: 100%; margin-bottom: 1.5rem;" />
+            <button id="saveApiKey" class="save-btn" style="width: 100%;">SAVE SETTINGS</button>
         </div>
     </div>
 
