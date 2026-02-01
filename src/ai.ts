@@ -114,8 +114,8 @@ async function getGroqResponse(messages: ChatMessage[], apiKey: string): Promise
         },
         body: JSON.stringify({
             model: 'llama-3.3-70b-versatile',
-            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-            response_format: { type: "json_object" }
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
+            // Removed forced JSON mode to allow natural English fallbacks
         })
     });
 
@@ -137,8 +137,8 @@ async function getOpenAIResponse(messages: ChatMessage[], apiKey: string): Promi
         },
         body: JSON.stringify({
             model: 'gpt-3.5-turbo',
-            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-            response_format: { type: "json_object" }
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
+            // Removed forced JSON mode to allow natural English fallbacks
         })
     });
 
