@@ -41,7 +41,6 @@ navItems.forEach(item => {
     sounds.click();
     const tabName = item.getAttribute('data-tab');
 
-    // Handle Settings separately
     if (item.id === 'settingsTrigger') {
       showModal();
       return;
@@ -49,11 +48,9 @@ navItems.forEach(item => {
 
     if (!tabName) return;
 
-    // Update Nav UI
     navItems.forEach(nav => nav.classList.remove('active'));
     item.classList.add('active');
 
-    // Update Section UI
     sections.forEach(sec => {
       sec.classList.remove('active');
       if (sec.id === tabName) {
@@ -67,12 +64,10 @@ navItems.forEach(item => {
 const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 let recognition: SpeechRecognition | null = null;
 
-let isProcessing = false;
-
 if (SpeechRecognitionClass) {
   recognition = new SpeechRecognitionClass() as SpeechRecognition;
   if (recognition) {
-    recognition.continuous = false; // Revert to false for more predictable restarts
+    recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
   }
@@ -80,19 +75,13 @@ if (SpeechRecognitionClass) {
 
 if (recognition) {
   recognition.onresult = (event: any) => {
-    let transcript = '';
-    for (let i = 0; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
-    }
+    const transcript = Array.from(event.results)
+      .map((result: any) => result[0])
+      .map((result: any) => result.transcript)
+      .join('');
 
-    // URGENT INTERRUPT: Check if the word "stop" or "aura" is being said
-    if (transcript.toLowerCase().includes('stop aura')) {
-      stopAll();
-      return;
-    }
-
-    if (event.results[event.results.length - 1].isFinal) {
-      handleFinalTranscript(event.results[event.results.length - 1][0].transcript);
+    if (event.results[0].isFinal) {
+      handleFinalTranscript(transcript);
     }
   };
 
@@ -110,14 +99,7 @@ if (recognition) {
   addBubble("SPEECH NOT SUPPORTED", 'aura');
 }
 
-function stopAll() {
-  window.speechSynthesis.cancel();
-  isProcessing = false;
-  stopListening();
-  addBubble("STOPPED.", 'aura');
-  sounds.click();
-}
-
+// --- Functions ---
 function startListening() {
   if (!recognition) return;
 
@@ -125,6 +107,7 @@ function startListening() {
   sounds.listen();
   micBtn.classList.add('active');
   auraBot.classList.add('listening');
+
   pixelBars.forEach(b => b.classList.add('animate'));
 
   try {
@@ -139,9 +122,11 @@ function stopListening() {
   micBtn.classList.remove('active');
   auraBot.classList.remove('listening');
   pixelBars.forEach(b => b.classList.remove('animate'));
-  try {
-    if (recognition) recognition.stop();
-  } catch (e) { }
+  if (recognition) {
+    try {
+      recognition.stop();
+    } catch (e) { }
+  }
 }
 
 function addBubble(text: string, type: 'user' | 'aura') {
@@ -165,25 +150,16 @@ function addToHistory(role: string, text: string) {
   historyLogs.prepend(entry);
 }
 
-// --- Functions ---
 async function handleFinalTranscript(text: string) {
   stopListening();
-  const lowerText = text.toLowerCase().trim();
+  if (!text.trim()) return;
 
-  if (!lowerText || lowerText === 'stop aura') {
-    stopAll();
-    return;
-  }
-
-  isProcessing = true;
   sounds.click();
   addBubble(text, 'user');
   addToHistory('USER', text);
 
-  // Add user message to history state immediately
   conversationHistory.push({ role: 'user', content: text });
 
-  // UI State
   const loadingId = 'loading-' + Date.now();
   const loadingBubble = document.createElement('div');
   loadingBubble.id = loadingId;
@@ -195,32 +171,18 @@ async function handleFinalTranscript(text: string) {
   sounds.processing();
 
   try {
-    // Inject the latest local time/date/day context so AURA is always accurate
     const timeContext: ChatMessage = {
       role: 'system',
       content: `[SYSTEM CONTEXT] The current local time is ${new Date().toLocaleString()}. Provide this if asked.`
     };
 
     const aiResult = await getAIResponse([...conversationHistory, timeContext], apiKey, provider);
-
-    // Check if the user stopped AURA while we were thinking
-    if (!isProcessing) return;
-
     const aiResponse = aiResult.text;
 
-    // Remove loading bubble
     const loader = document.getElementById(loadingId);
     if (loader) loader.remove();
 
-    // Add assistant response to history
     conversationHistory.push({ role: 'assistant', content: aiResponse });
-
-    // Logging Intent
-    if (aiResult.intent) {
-      console.log('Intent Detected:', aiResult.intent);
-    }
-
-    if (!isProcessing) return;
 
     sounds.success();
     addBubble(aiResponse, 'aura');
@@ -252,14 +214,10 @@ async function handleFinalTranscript(text: string) {
 function speak(text: string) {
   window.speechSynthesis.cancel();
 
-  // Convert to sentence case for better pronunciation (engines often spell out all-caps)
   const spokenText = text.toLowerCase().replace(/(^\w|\.\s+\w)/gm, s => s.toUpperCase());
   const utterance = new SpeechSynthesisUtterance(spokenText);
 
-  // Improved Voice Selection Logic
   const voices = window.speechSynthesis.getVoices();
-
-  // Prioritize "Premium" or "Google" voices which are usually higher quality
   let selectedVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en'))
     || voices.find(v => (v.name.includes('Premium') || v.name.includes('Enhanced')) && v.lang.startsWith('en'))
     || voices.find(v => v.lang.startsWith('en'))
@@ -267,18 +225,13 @@ function speak(text: string) {
 
   if (selectedVoice) utterance.voice = selectedVoice;
 
-  // Tuning for clarity
-  utterance.rate = 0.95; // Slightly slower for better articulation
-  utterance.pitch = 1.0; // Keep it natural
+  utterance.rate = 0.95;
+  utterance.pitch = 1.0;
   utterance.volume = 1.0;
 
   utterance.onstart = () => {
     auraBot.classList.add('listening');
     pixelBars.forEach(b => b.classList.add('animate'));
-    // Restart mic while she speaks to hear the "stop" command
-    setTimeout(() => {
-      if (!isListening) startListening();
-    }, 100);
   };
 
   utterance.onend = () => {
@@ -289,7 +242,6 @@ function speak(text: string) {
   window.speechSynthesis.speak(utterance);
 }
 
-// --- Settings Modal ---
 function showModal() {
   apiKeyInput.value = apiKey;
   providerSelect.value = provider;
@@ -302,13 +254,9 @@ function hideModal() {
   sounds.click();
 }
 
-// --- Event Listeners ---
 micBtn.addEventListener('click', () => {
   sounds.click();
-  // If she is talking or thinking, make the button a STOP button
-  if (window.speechSynthesis.speaking || isProcessing) {
-    stopAll();
-  } else if (isListening) {
+  if (isListening) {
     stopListening();
   } else {
     startListening();
@@ -333,7 +281,6 @@ saveApiKeyBtn.addEventListener('click', () => {
   addBubble(`SETTINGS UPDATED: ${provider.toUpperCase()} ACTIVE.`, 'aura');
 });
 
-// Initialize voices
 window.speechSynthesis.getVoices();
 if (speechSynthesis.onvoiceschanged !== undefined) {
   speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
