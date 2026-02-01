@@ -70,7 +70,7 @@ let recognition: SpeechRecognition | null = null;
 if (SpeechRecognitionClass) {
   recognition = new SpeechRecognitionClass() as SpeechRecognition;
   if (recognition) {
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
   }
@@ -78,20 +78,20 @@ if (SpeechRecognitionClass) {
 
 if (recognition) {
   recognition.onresult = (event: any) => {
-    const transcript = Array.from(event.results)
-      .map((result: any) => result[0])
-      .map((result: any) => result.transcript)
-      .join('');
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      const transcript = event.results[i][0].transcript.toLowerCase();
 
-    // INTERRUPT: If user says "stop aura"
-    if (transcript.toLowerCase().includes('stop aura')) {
-      window.speechSynthesis.cancel();
-      stopListening();
-      return;
-    }
+      // REAL-TIME INTERRUPT: Stop everything if "stop aura" is heard
+      if (transcript.includes('stop aura')) {
+        window.speechSynthesis.cancel();
+        stopListening();
+        addBubble("Aura Stopped.", 'aura');
+        return;
+      }
 
-    if (event.results[0].isFinal) {
-      handleFinalTranscript(transcript);
+      if (event.results[i].isFinal) {
+        handleFinalTranscript(event.results[i][0].transcript);
+      }
     }
   };
 
@@ -255,11 +255,15 @@ function speak(text: string) {
   utterance.onstart = () => {
     auraBot.classList.add('listening');
     pixelBars.forEach(b => b.classList.add('animate'));
+    // Ensure mic is active to hear "Stop Aura"
+    if (!isListening) startListening();
   };
 
   utterance.onend = () => {
     auraBot.classList.remove('listening');
     pixelBars.forEach(b => b.classList.remove('animate'));
+    // Turn off mic after she finishes talking
+    stopListening();
   };
 
   window.speechSynthesis.speak(utterance);
