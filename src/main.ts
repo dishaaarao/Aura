@@ -169,7 +169,13 @@ async function handleFinalTranscript(text: string) {
   sounds.processing();
 
   try {
-    const aiResult = await getAIResponse(conversationHistory, apiKey, provider);
+    // Inject the latest local time/date/day context so AURA is always accurate
+    const timeContext: ChatMessage = {
+      role: 'system',
+      content: `[SYSTEM CONTEXT] The current local time is ${new Date().toLocaleString()}. Provide this if asked.`
+    };
+
+    const aiResult = await getAIResponse([...conversationHistory, timeContext], apiKey, provider);
     const aiResponse = aiResult.text;
 
     // Remove loading bubble
