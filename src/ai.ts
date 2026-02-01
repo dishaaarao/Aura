@@ -3,20 +3,55 @@ export interface ChatMessage {
     content: string;
 }
 
+
 export type AIProvider = 'gemini' | 'groq' | 'openai';
 
 export interface AIResponse {
     text: string;
+    type?: 'system' | 'live';
+    action?: string;
+    topic?: string;
     intent?: {
         type: 'math' | 'repeat' | 'joke' | 'time' | 'conversation' | 'action';
         value?: string;
     };
 }
 
-const SYSTEM_PROMPT = `You are AURA, a retro pixel-style voice assistant. 
-Your personality: Friendly, robotic but warm. Always respond in ALL-CAPS.
-CRITICAL: You MUST return a JSON object with a "text" field.
-Example: {"text": "HELLO HUMAN"}
+const SYSTEM_PROMPT = `You are Aura, a smart real-world AI assistant.
+
+Think before responding.
+
+First decide where the information should come from:
+- system → current time, date
+- static knowledge → geography, history, basic politics
+- live knowledge → current leaders, elections, news, ongoing events
+
+RULES:
+• If system data is needed, return JSON only:
+{
+  "type": "system",
+  "action": "fetch",
+  "response": "Checking that for you ⏰"
+}
+
+• If live data is needed, return JSON only:
+{
+  "type": "live",
+  "topic": "<exact info needed>",
+  "response": "Let me get the latest update 🌍"
+}
+
+• Otherwise, answer naturally in plain English.
+
+STYLE:
+• Sound human, calm, and confident
+• Be concise and clear
+• Neutral and factual for politics
+• Max one emoji
+• Never mention models, APIs, or training
+• Never guess live facts
+
+If unsure, say so and ask for clarification.
 `;
 
 export async function getAIResponse(
@@ -70,7 +105,7 @@ async function getGroqResponse(messages: ChatMessage[], apiKey: string): Promise
             'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile', // Updated to the latest Groq model
+            model: 'llama-3.3-70b-versatile',
             messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
             response_format: { type: "json_object" }
         })
@@ -112,11 +147,19 @@ function parseAIResponse(raw: string): AIResponse {
     try {
         const clean = raw.replace(/```json|```/g, '').trim();
         const parsed = JSON.parse(clean);
+
         return {
-            text: (parsed.text || parsed.message || parsed.response || raw).toUpperCase(),
+            text: (parsed.response || parsed.text || parsed.message || (typeof parsed === 'string' ? parsed : raw)),
+            type: parsed.type,
+            action: parsed.action,
+            topic: parsed.topic,
             intent: parsed.intent || { type: 'conversation' }
         };
     } catch (e) {
-        return { text: raw.toUpperCase(), intent: { type: 'conversation' } };
+        // If it's not JSON, it's just raw natural language text
+        return {
+            text: raw,
+            intent: { type: 'conversation' }
+        };
     }
 }

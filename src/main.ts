@@ -157,19 +157,49 @@ async function handleFinalTranscript(text: string) {
   // Add user message to history state immediately
   conversationHistory.push({ role: 'user', content: text });
 
-  // Simulate API delay / UI State
+  // UI State
   const loadingId = 'loading-' + Date.now();
   const loadingBubble = document.createElement('div');
   loadingBubble.id = loadingId;
   loadingBubble.className = 'pixel-bubble aura';
-  loadingBubble.textContent = "THINKING...";
+  loadingBubble.textContent = "Aura is thinking...";
   chatContainer.appendChild(loadingBubble);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 
   sounds.processing();
 
   try {
-    const aiResult = await getAIResponse(conversationHistory, apiKey, provider);
+    let aiResult = await getAIResponse(conversationHistory, apiKey, provider);
+
+    // Handle specific smart actions (System Fetch / Live Knowledge)
+    if (aiResult.type === 'system' && aiResult.action === 'fetch') {
+      const currentTime = new Date().toLocaleString();
+      const systemInfo = `[SYSTEM DATA] The current local time and date is ${currentTime}. Answer the user naturally based on this.`;
+
+      // Show the intermediate response if provided
+      if (aiResult.text) {
+        const loader = document.getElementById(loadingId);
+        if (loader) loader.textContent = aiResult.text;
+      }
+
+      // Re-query with system info
+      conversationHistory.push({ role: 'assistant', content: aiResult.text || "Checking that for you." });
+      conversationHistory.push({ role: 'system', content: systemInfo });
+
+      aiResult = await getAIResponse(conversationHistory, apiKey, provider);
+    } else if (aiResult.type === 'live') {
+      // Placeholder for Live Search logic
+      const loader = document.getElementById(loadingId);
+      if (loader) loader.textContent = aiResult.text || "Searching...";
+
+      const liveInfo = `[LIVE DATA] I am unable to access live news/web search in this environment yet. Inform the user politely.`;
+
+      conversationHistory.push({ role: 'assistant', content: aiResult.text || "Let me get the latest update." });
+      conversationHistory.push({ role: 'system', content: liveInfo });
+
+      aiResult = await getAIResponse(conversationHistory, apiKey, provider);
+    }
+
     const aiResponse = aiResult.text;
 
     // Remove loading bubble
@@ -179,10 +209,9 @@ async function handleFinalTranscript(text: string) {
     // Add assistant response to history
     conversationHistory.push({ role: 'assistant', content: aiResponse });
 
-    // Handle Intens/Actions
+    // Logging Intent
     if (aiResult.intent) {
-      console.log('Detected Intent:', aiResult.intent);
-      // We can add specific logic here if needed, but for now LLM handles the response text
+      console.log('Intent Detected:', aiResult.intent);
     }
 
     sounds.success();
@@ -197,30 +226,43 @@ async function handleFinalTranscript(text: string) {
     console.error('Handled Error:', error);
     sounds.error();
 
-    let errorMsg = "OOPS! SOMETHING WENT WRONG.";
+    let errorMsg = "Something went wrong. Please try again.";
 
     if (error.message.includes('API Key') || error.message.includes('key')) {
-      errorMsg = "API KEY ERROR! CHECK SETTINGS.";
+      errorMsg = "API configuration error. Please check your settings.";
     } else if (error.message.includes('INTERNAL_PARSE_ERROR')) {
-      errorMsg = "AI RETURNED INVALID DATA. TRY AGAIN.";
+      errorMsg = "I received an invalid response. Let's try that again.";
     } else if (error.message) {
-      // Show the actual error message from the API if possible, but keep it concise
-      errorMsg = error.message.toUpperCase().substring(0, 50);
+      errorMsg = error.message.substring(0, 100);
     }
 
-    addBubble(`ERROR: ${errorMsg}`, 'aura');
-    speak("ERROR DETECTED");
+    addBubble(`Error: ${errorMsg}`, 'aura');
+    speak("I encountered an error.");
   }
 }
 
 function speak(text: string) {
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
 
-  // Try to find a retro-ish or robotic voice if available, otherwise default female
+  // Convert to sentence case for better pronunciation (engines often spell out all-caps)
+  const spokenText = text.toLowerCase().replace(/(^\w|\.\s+\w)/gm, s => s.toUpperCase());
+  const utterance = new SpeechSynthesisUtterance(spokenText);
+
+  // Improved Voice Selection Logic
   const voices = window.speechSynthesis.getVoices();
-  const preferredVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Female')) || voices[0];
-  if (preferredVoice) utterance.voice = preferredVoice;
+
+  // Prioritize "Premium" or "Google" voices which are usually higher quality
+  let selectedVoice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en'))
+    || voices.find(v => (v.name.includes('Premium') || v.name.includes('Enhanced')) && v.lang.startsWith('en'))
+    || voices.find(v => v.lang.startsWith('en'))
+    || voices[0];
+
+  if (selectedVoice) utterance.voice = selectedVoice;
+
+  // Tuning for clarity
+  utterance.rate = 0.95; // Slightly slower for better articulation
+  utterance.pitch = 1.0; // Keep it natural
+  utterance.volume = 1.0;
 
   utterance.onstart = () => {
     auraBot.classList.add('listening');
