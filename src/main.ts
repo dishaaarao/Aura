@@ -83,6 +83,13 @@ if (recognition) {
       .map((result: any) => result.transcript)
       .join('');
 
+    // INTERRUPT: If user says "stop aura"
+    if (transcript.toLowerCase().includes('stop aura')) {
+      window.speechSynthesis.cancel();
+      stopListening();
+      return;
+    }
+
     if (event.results[0].isFinal) {
       handleFinalTranscript(transcript);
     }
@@ -148,7 +155,12 @@ function addToHistory(role: string, text: string) {
 // --- Functions ---
 async function handleFinalTranscript(text: string) {
   stopListening();
-  if (!text.trim()) return;
+  const lowerText = text.toLowerCase().trim();
+
+  if (!lowerText || lowerText === 'stop aura') {
+    window.speechSynthesis.cancel();
+    return;
+  }
 
   sounds.click();
   addBubble(text, 'user');
