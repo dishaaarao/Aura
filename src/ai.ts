@@ -7,45 +7,17 @@ export type AIProvider = 'gemini' | 'groq' | 'openai';
 
 export interface AIResponse {
     text: string;
-    type?: 'system' | 'live';
-    action?: string;
-    topic?: string;
     intent?: {
         type: 'math' | 'repeat' | 'joke' | 'time' | 'conversation' | 'action';
         value?: string;
     };
 }
 
-const SYSTEM_PROMPT = `You are Aura, a smart real-world AI assistant.
-
-Think before responding. Use natural, human-like capitalization (Sentence case).
-
-First decide where the information should come from:
-- system → current time, date
-- static knowledge → geography, history, basic politics
-- live knowledge → current leaders, elections, news, ongoing events
-
-RULES:
-• If system data is needed (like current time or date), return JSON only:
-{
-  "type": "system",
-  "action": "fetch",
-  "response": "Checking that for you..."
-}
-
-• If live data is needed, return JSON only:
-{
-  "type": "live",
-  "topic": "<exact info needed>",
-  "response": "Let me get the latest update for you."
-}
-
-• Otherwise, answer naturally in plain English. 
-
-STYLE:
-• Sound human, calm, and confident.
-• Use standard sentence case (no all-caps).
-• Max one emoji.
+const SYSTEM_PROMPT = `You are AURA, a retro pixel-style voice assistant. 
+Your personality: Friendly, robotic but warm. Always respond in ALL-CAPS.
+Keep responses concise and natural for speech.
+CRITICAL: You MUST return a JSON object with a "text" field.
+Example: {"text": "HELLO HUMAN"}
 `;
 
 export async function getAIResponse(
@@ -66,19 +38,13 @@ export async function getAIResponse(
 }
 
 async function getGeminiResponse(messages: ChatMessage[], apiKey: string): Promise<AIResponse> {
-    // Process messages into a strictly alternating User/Model list.
-    // System messages are merged into the preceding user message to avoid sequential roles.
     const contents: any[] = [];
-
-    messages.forEach((m, idx) => {
+    messages.forEach((m) => {
         const role = m.role === 'assistant' ? 'model' : 'user';
-        const text = m.role === 'system' ? `[SYSTEM CONTEXT]: ${m.content}` : m.content;
-
         if (contents.length > 0 && contents[contents.length - 1].role === role) {
-            // Merge with existing role to avoid repetition (Gemini requirement)
-            contents[contents.length - 1].parts[0].text += `\n\n${text}`;
+            contents[contents.length - 1].parts[0].text += `\n${m.content}`;
         } else {
-            contents.push({ role, parts: [{ text }] });
+            contents.push({ role, parts: [{ text: m.content }] });
         }
     });
 
@@ -90,10 +56,7 @@ async function getGeminiResponse(messages: ChatMessage[], apiKey: string): Promi
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                    contents: contents,
-                    generationConfig: {
-                        // responseMimeType: "application/json" // Removed to allow natural language fallbacks
-                    }
+                    contents: contents
                 })
             });
             if (!res.ok) continue;
@@ -102,7 +65,7 @@ async function getGeminiResponse(messages: ChatMessage[], apiKey: string): Promi
             if (text) return parseAIResponse(text);
         } catch (e) { continue; }
     }
-    throw new Error("Gemini failed after multiple attempts.");
+    throw new Error("Gemini Connection Error.");
 }
 
 async function getGroqResponse(messages: ChatMessage[], apiKey: string): Promise<AIResponse> {
@@ -115,7 +78,6 @@ async function getGroqResponse(messages: ChatMessage[], apiKey: string): Promise
         body: JSON.stringify({
             model: 'llama-3.3-70b-versatile',
             messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
-            // Removed forced JSON mode to allow natural English fallbacks
         })
     });
 
@@ -138,7 +100,6 @@ async function getOpenAIResponse(messages: ChatMessage[], apiKey: string): Promi
         body: JSON.stringify({
             model: 'gpt-3.5-turbo',
             messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
-            // Removed forced JSON mode to allow natural English fallbacks
         })
     });
 
@@ -155,18 +116,11 @@ function parseAIResponse(raw: string): AIResponse {
     try {
         const clean = raw.replace(/```json|```/g, '').trim();
         const parsed = JSON.parse(clean);
-
         return {
-            text: (parsed.response || parsed.text || parsed.message || (typeof parsed === 'string' ? parsed : raw)),
-            type: parsed.type,
-            action: parsed.action,
-            topic: parsed.topic,
+            text: (parsed.text || parsed.response || parsed.message || raw).toUpperCase(),
             intent: parsed.intent || { type: 'conversation' }
         };
     } catch (e) {
-        return {
-            text: raw,
-            intent: { type: 'conversation' }
-        };
+        return { text: raw.toUpperCase(), intent: { type: 'conversation' } };
     }
 }

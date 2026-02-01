@@ -492,6 +492,7 @@ input {
   background: var(--sky-blue);
   color: var(--pixel-black);
   border-color: var(--pixel-black);
+  text-transform: uppercase;
 }
 
 /* --- Sections & Navigation --- */

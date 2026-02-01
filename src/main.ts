@@ -162,44 +162,14 @@ async function handleFinalTranscript(text: string) {
   const loadingBubble = document.createElement('div');
   loadingBubble.id = loadingId;
   loadingBubble.className = 'pixel-bubble aura';
-  loadingBubble.textContent = "Aura is thinking...";
+  loadingBubble.textContent = "THINKING...";
   chatContainer.appendChild(loadingBubble);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 
   sounds.processing();
 
   try {
-    let aiResult = await getAIResponse(conversationHistory, apiKey, provider);
-
-    // Handle specific smart actions (System Fetch / Live Knowledge)
-    if (aiResult.type === 'system' && aiResult.action === 'fetch') {
-      const currentTime = new Date().toLocaleString();
-      const systemInfo = `[SYSTEM DATA] The current local time and date is ${currentTime}. Answer the user naturally based on this.`;
-
-      // Show the intermediate response if provided
-      if (aiResult.text) {
-        const loader = document.getElementById(loadingId);
-        if (loader) loader.textContent = aiResult.text;
-      }
-
-      // Re-query with system info
-      conversationHistory.push({ role: 'assistant', content: aiResult.text || "Checking that for you." });
-      conversationHistory.push({ role: 'system', content: systemInfo });
-
-      aiResult = await getAIResponse(conversationHistory, apiKey, provider);
-    } else if (aiResult.type === 'live') {
-      // Placeholder for Live Search logic
-      const loader = document.getElementById(loadingId);
-      if (loader) loader.textContent = aiResult.text || "Searching...";
-
-      const liveInfo = `[LIVE DATA] I am unable to access live news/web search in this environment yet. Inform the user politely.`;
-
-      conversationHistory.push({ role: 'assistant', content: aiResult.text || "Let me get the latest update." });
-      conversationHistory.push({ role: 'system', content: liveInfo });
-
-      aiResult = await getAIResponse(conversationHistory, apiKey, provider);
-    }
-
+    const aiResult = await getAIResponse(conversationHistory, apiKey, provider);
     const aiResponse = aiResult.text;
 
     // Remove loading bubble
@@ -226,18 +196,18 @@ async function handleFinalTranscript(text: string) {
     console.error('Handled Error:', error);
     sounds.error();
 
-    let errorMsg = "Something went wrong. Please try again.";
+    let errorMsg = "OOPS! SOMETHING WENT WRONG.";
 
     if (error.message.includes('API Key') || error.message.includes('key')) {
-      errorMsg = "API configuration error. Please check your settings.";
-    } else if (error.message.includes('INTERNAL_PARSE_ERROR')) {
-      errorMsg = "I received an invalid response. Let's try that again.";
+      errorMsg = "API KEY ERROR! CHECK SETTINGS.";
+    } else if (error.message.includes('INTERNAL_PARSE_ERROR') || error.message.includes('JSON')) {
+      errorMsg = "INVALID AI DATA. TRY AGAIN.";
     } else if (error.message) {
-      errorMsg = error.message.substring(0, 100);
+      errorMsg = error.message.toUpperCase().substring(0, 50);
     }
 
-    addBubble(`Error: ${errorMsg}`, 'aura');
-    speak("I encountered an error.");
+    addBubble(`ERROR: ${errorMsg}`, 'aura');
+    speak("ERROR DETECTED");
   }
 }
 
