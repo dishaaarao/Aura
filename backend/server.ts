@@ -1,0 +1,166 @@
+import express from 'express';
+import type { Request, Response } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { Pool } from 'pg';
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// PostgreSQL Connection
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+});
+
+// Test DB Connection and Initialize Table
+async function initDB() {
+    try {
+        await pool.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+        console.log('✅ PostgreSQL Connected & Table Ready');
+    } catch (err) {
+        console.error('❌ Database connection error:', err);
+    }
+}
+initDB();
+
+// AI Provider Logic
+const SYSTEM_PROMPT = `You are AURA, a retro pixel-style voice assistant. 
+Your personality: Friendly, robotic but warm. Always respond in ALL-CAPS.
+You will receive [SYSTEM CONTEXT] messages containing the current time and date. Use that information to answer time-related questions accurately.
+Keep responses concise and natural for speech.
+CRITICAL: You MUST return a JSON object with a "text" field.
+`;
+
+async function getGeminiResponse(messages: any[], apiKey: string) {
+    const contents: any[] = [];
+    messages.forEach((m: any) => {
+        const role = m.role === 'assistant' ? 'model' : 'user';
+        if (contents.length > 0 && contents[contents.length - 1].role === role) {
+            contents[contents.length - 1].parts[0].text += `\n${m.content}`;
+        } else {
+            contents.push({ role, parts: [{ text: m.content }] });
+        }
+    });
+
+    const models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
+    for (const model of models) {
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                    contents: contents
+                })
+            });
+            if (!res.ok) continue;
+            const data: any = await res.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) return text;
+        } catch (e) { continue; }
+    }
+    throw new Error("Gemini Connection Error.");
+}
+
+async function getGroqResponse(messages: any[], apiKey: string) {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
+        })
+    });
+    const data: any = await res.json();
+    return data.choices[0].message.content;
+}
+
+async function getOpenAIResponse(messages: any[], apiKey: string) {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
+        })
+    });
+    const data: any = await res.json();
+    return data.choices[0].message.content;
+}
+
+// Routes
+app.post('/api/chat', async (req: Request, res: Response) => {
+    const { messages, provider } = req.body;
+    const lastUserMessage = messages[messages.length - 1].content;
+
+    try {
+        // 1. Save User Message to Postgres
+        await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['user', lastUserMessage]);
+
+        // 2. Get AI Response
+        let aiText = '';
+        const apiKey = provider === 'gemini' ? process.env.GEMINI_API_KEY
+            : provider === 'groq' ? process.env.GROQ_API_KEY
+                : process.env.OPENAI_API_KEY;
+
+        if (!apiKey) throw new Error(`API Key for ${provider} is not configured on server.`);
+
+        if (provider === 'gemini') {
+            aiText = await getGeminiResponse(messages, apiKey);
+        } else if (provider === 'groq') {
+            aiText = await getGroqResponse(messages, apiKey);
+        } else {
+            aiText = await getOpenAIResponse(messages, apiKey);
+        }
+
+        // Parse AI text (clean JSON etc)
+        let finalText = aiText;
+        try {
+            const clean = aiText.replace(/```json|```/g, '').trim();
+            const parsed = JSON.parse(clean);
+            finalText = (parsed.text || parsed.response || aiText).toUpperCase();
+        } catch (e) {
+            finalText = aiText.toUpperCase();
+        }
+
+        // 3. Save AI Message to Postgres
+        await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['assistant', finalText]);
+
+        res.json({ text: finalText });
+    } catch (error: any) {
+        console.error('Server AI Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/history', async (req: Request, res: Response) => {
+    try {
+        const result = await pool.query('SELECT * FROM messages ORDER BY timestamp ASC LIMIT 50');
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch history' });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`🚀 AURA Backend running on http://localhost:${PORT}`);
+});
