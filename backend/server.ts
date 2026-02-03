@@ -132,15 +132,27 @@ app.post('/api/chat', async (req: Request, res: Response) => {
             aiText = await getOpenAIResponse(messages, apiKey);
         }
 
-        // Parse AI text (clean JSON etc)
+        // SMART PARSER: Extract only the natural language, removing accidental JSON
         let finalText = aiText;
         try {
-            const clean = aiText.replace(/```json|```/g, '').trim();
-            const parsed = JSON.parse(clean);
-            finalText = (parsed.text || parsed.response || aiText).toUpperCase();
+            // Check if there is a JSON block anywhere in the text
+            const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const potentialJson = jsonMatch[0];
+                const cleanJson = potentialJson.replace(/```json|```/g, '').trim();
+                const parsed = JSON.parse(cleanJson);
+                // If it's valid JSON, use the 'text' field. If not, strip the JSON from the string.
+                finalText = (parsed.text || parsed.response || parsed.message || aiText.replace(potentialJson, '').trim());
+            } else {
+                // If no JSON object found, just clean the text of any stray backticks or braces
+                finalText = aiText.replace(/```json|```|\{|\}/g, '').trim();
+            }
         } catch (e) {
-            finalText = aiText.toUpperCase();
+            // Fallback: strip everything starting from the first curly brace
+            finalText = aiText.split('{')[0].trim() || aiText;
         }
+
+        finalText = finalText.toUpperCase();
 
         // 3. Save AI Message to Postgres
         await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['assistant', finalText]);
