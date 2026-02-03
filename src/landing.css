@@ -1,52 +1,55 @@
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 :root {
-    --sky-blue: #96bbcf;
+    --sky-blue: #a0d8f0;
+    --pixel-dark-blue: #2a3c8e;
+    --pixel-light-blue: #6482c3;
     --pixel-white: #ffffff;
-    --pixel-black: #080808;
-    --retro-pink: #ec1c74;
+    --monitor-grey: #4a4a4a;
+    --monitor-inner: #1a1a1a;
 }
 
-/* --- THE CRT MONITOR SCOPE --- */
+/* --- LANDING VIEW WRAPPER --- */
 #view-landing {
-    font-family: 'VT323', monospace;
-    background-color: #1a1a1b;
-    height: 100vh;
+    position: fixed;
+    inset: 0;
+    background-color: #222;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
     z-index: 9999;
+    font-family: 'VT323', monospace;
+    overflow: hidden;
 }
 
 #view-landing.hidden {
     display: none !important;
 }
 
-#view-landing .monitor-frame {
-    width: 90vw;
-    max-width: 1000px;
-    height: 80vh;
-    background: #333;
-    border: 12px solid #222;
-    border-radius: 60px;
-    padding: 20px;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 20px #000;
+/* --- THE AUTHENTIC CRT TV --- */
+.monitor-frame {
+    width: 95vw;
+    max-width: 900px;
+    aspect-ratio: 4 / 3;
+    background: linear-gradient(145deg, #555, #333);
+    border-radius: 80px;
+    padding: 40px;
+    box-shadow:
+        0 50px 100px rgba(0, 0, 0, 0.8),
+        inset 0 2px 10px rgba(255, 255, 255, 0.2),
+        inset 0 -5px 20px rgba(0, 0, 0, 0.5);
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 4px solid #444;
 }
 
-#view-landing .screen {
+.screen {
     width: 100%;
     height: 100%;
     background-color: var(--sky-blue);
-    border-radius: 40px;
+    border-radius: 60px;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -54,117 +57,169 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    border: 10px solid #111;
-    animation: landing-flicker 0.1s infinite alternate;
+    border: 15px solid #111;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+    animation: crt-flicker 0.15s infinite alternate;
 }
 
-#view-landing .pixel-clouds {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-#view-landing .cloud {
-    position: absolute;
-    background: #f8ccd4;
-    width: 100px;
-    height: 50px;
-    border-radius: 30px;
-    box-shadow: 20px 0 0 #f8ccd4, -20px 0 0 #f8ccd4;
-}
-
-#view-landing .cloud::before,
-#view-landing .cloud::after {
-    content: '';
-    position: absolute;
-    width: 25px;
-    height: 25px;
-    background: #f8ccd4;
-    border-radius: 50%;
-    top: -10px;
-}
-
-#view-landing .cloud::before {
-    left: 15px;
-}
-
-#view-landing .cloud::after {
-    right: 15px;
-}
-
-#view-landing .intro-text {
-    font-size: 1.5rem;
-    letter-spacing: 5px;
-    color: #1d3354;
-    margin-bottom: 0px;
-    text-transform: uppercase;
-}
-
-#view-landing .main-title {
-    font-size: 10rem;
-    color: #fff;
-    text-shadow: 8px 8px 0px rgba(29, 51, 84, 0.4);
-    margin: 0.5rem 0 1rem 0;
-    font-weight: normal;
-    line-height: 1;
-}
-
-#view-landing .subtitle {
-    font-size: 2.5rem;
-    background: #1d3354;
-    color: #fff;
-    padding: 0 15px;
-    margin-bottom: 4rem;
-    display: inline-block;
-}
-
-#view-landing .start-btn {
-    background: #fff;
-    border: 5px solid #1d3354;
-    color: #1d3354;
-    padding: 15px 40px;
-    font-family: inherit;
-    font-size: 2.5rem;
-    cursor: pointer;
-    box-shadow: 8px 8px 0px #1d3354;
-    transition: all 0.1s;
-    animation: landing-pulse 1.5s infinite;
-}
-
-#view-landing .start-btn:hover {
-    transform: scale(1.05);
-    background: #f0f0f0;
-}
-
-#view-landing .start-btn:active {
-    transform: translate(6px, 6px);
-    box-shadow: 0px 0px 0px #1d3354;
-}
-
-#view-landing .scanlines {
+/* --- PIXEL CLOUDS (SCREEN WRAPPED) --- */
+.pixel-clouds {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Creating pixelated clouds using layered box-shadows */
+.cloud-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+/* Base Cloud Shape */
+.pixel-cloud {
+    position: absolute;
+    background: white;
+    width: 100px;
+    height: 40px;
+    box-shadow:
+        -20px 10px 0 white, 20px 10px 0 white,
+        -40px 20px 0 white, 40px 20px 0 white,
+        0 -10px 0 white;
+}
+
+.c1 {
+    top: 20%;
+    left: 10%;
+    transform: scale(1.5);
+    opacity: 0.8;
+}
+
+.c2 {
+    top: 15%;
+    right: 15%;
+    transform: scale(1.2);
+    opacity: 0.6;
+}
+
+.c3 {
+    bottom: 30%;
+    left: 30%;
+    transform: scale(2);
+    opacity: 0.9;
+}
+
+/* Large bottom cloud banks */
+.cloud-bank {
+    position: absolute;
+    bottom: -20px;
+    width: 120%;
+    height: 150px;
+    background: white;
+    left: -10%;
+    box-shadow:
+        0 -20px 0 white,
+        -100px -40px 0 white,
+        100px -40px 0 white,
+        -200px -20px 0 white,
+        200px -20px 0 white;
+}
+
+/* --- CONTENT --- */
+.landing-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.by-text {
+    font-size: 1.2rem;
+    color: var(--pixel-dark-blue);
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.intro-word {
+    font-size: 3rem;
+    color: var(--pixel-light-blue);
+    margin-bottom: 15px;
+    font-weight: normal;
+    text-transform: lowercase;
+}
+
+.main-title {
+    font-size: 10rem;
+    color: var(--pixel-dark-blue);
+    line-height: 0.8;
+    margin-bottom: 20px;
+    text-shadow: 4px 4px 0px rgba(255, 255, 255, 0.5);
+}
+
+.pixel-font-sub {
+    font-size: 2.5rem;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    margin-bottom: 40px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* --- PRESS START BUTTON (AUTHENTIC) --- */
+.start-btn {
+    background: white;
+    border: 4px solid var(--pixel-light-blue);
+    color: var(--pixel-light-blue);
+    padding: 10px 30px;
+    font-family: inherit;
+    font-size: 1.8rem;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.1s;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+    animation: button-blink 2s infinite;
+}
+
+.start-btn:hover {
+    background: var(--pixel-light-blue);
+    color: white;
+}
+
+.start-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 transparent;
+}
+
+/* --- SCANLINES & GLARE --- */
+.scanlines {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg,
+            rgba(255, 0, 0, 0.02),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.02));
+    background-size: 100% 3px, 3px 100%;
     pointer-events: none;
     z-index: 20;
 }
 
-#view-landing .screen-glare {
+.glare {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+    background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
     z-index: 21;
 }
 
-@keyframes landing-flicker {
+@keyframes crt-flicker {
     0% {
-        opacity: 0.99;
+        opacity: 0.98;
     }
 
     100% {
@@ -172,7 +227,7 @@
     }
 }
 
-@keyframes landing-pulse {
+@keyframes button-blink {
 
     0%,
     100% {
@@ -180,6 +235,6 @@
     }
 
     50% {
-        opacity: 0.7;
+        opacity: 0.8;
     }
 }
