@@ -12,35 +12,42 @@
 
 <body>
     <!-- 1. LANDING VIEW (THE "FIRST PAGE" - CRT TV STYLE) -->
+    <!-- 1. LANDING VIEW (AUTHENTIC CRT TV) -->
     <div id="view-landing">
+        <!-- SVG FILTER FOR PIXELATED CLOUDS -->
+        <svg style="visibility: hidden; position: absolute;" width="0" height="0">
+            <filter id="pixelate-clouds" x="0" y="0">
+                <feFlood x="4" y="4" height="4" width="4" />
+                <feComposite width="8" height="8" />
+                <feTile result="a" />
+                <feComposite in="SourceGraphic" in2="a" operator="in" />
+                <feMorphology operator="dilate" radius="1.5" />
+            </filter>
+        </svg>
+
         <div class="monitor-frame">
             <div class="screen">
                 <!-- TV OVERLAYS -->
-                <div class="vignette"></div>
+                <div class="glare-top"></div>
                 <div class="scanlines"></div>
-                <div class="glass-reflection"></div>
+                <div class="screen-bulge"></div>
+                <div class="step-mask"></div>
 
-                <!-- CLOUD LAYERS (PIXEL TYPE) -->
+                <!-- CLOUD LAYERS (AUTHENTIC JAGGED) -->
                 <div class="pixel-clouds">
-                    <div class="pixel-cloud-entity c1"></div>
-                    <div class="pixel-cloud-entity c2"></div>
-                    <div class="pixel-cloud-entity c3"></div>
-                    <div class="cloud-bank-bottom"></div>
+                    <div class="jagged-cloud jc1"></div>
+                    <div class="jagged-cloud jc2"></div>
+                    <div class="cloud-bank-detailed"></div>
                 </div>
 
-                <!-- CONTENT (1:1 MATCH) -->
+                <!-- CONTENT -->
                 <div class="landing-content">
-                    <div class="screen-top">
-                        <p class="by-text">BY HELICA STD</p>
-                        <p class="intro-word">introducing</p>
-                    </div>
-
+                    <p class="by-text">BY HELICA STD</p>
+                    <p class="intro-word">introducing</p>
                     <h1 class="main-title">AURA</h1>
                     <p class="pixel-font-sub">PIXEL VOICE ASSISTANT</p>
 
-                    <div class="screen-bottom">
-                        <button id="btn-portal-start" class="start-btn">Press Start Button</button>
-                    </div>
+                    <button id="btn-portal-start" class="start-btn">Press Start Button</button>
                 </div>
             </div>
         </div>

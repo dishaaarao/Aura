@@ -1,19 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=VT323&family=Silkscreen&family=Press+Start+2P&display=swap');
 
 :root {
-    --tv-dark: #121212;
-    --tv-bezel: #2a2a2a;
-    --tv-glass: rgba(255, 255, 255, 0.05);
-    --sky-light: #d6e9f5;
-    --sky-mid: #96bbcf;
-    --pixel-blue-dark: #3a54a4;
-    --pixel-blue-light: #5b7cc6;
+    --tv-bezel-main: #5c5c5c;
+    --tv-bezel-dark: #2a2a2a;
+    --tv-bezel-light: #8a8a8a;
+    --sky-color: #a0d8f0;
+    --pixel-blue-text: #2a3c8e;
+    --pixel-light-blue: #6482c3;
 }
 
 #view-landing {
     position: fixed;
     inset: 0;
-    background-color: #000;
+    background-color: #111;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -26,55 +25,55 @@
     display: none !important;
 }
 
-/* --- THE REALISTIC CRT TV CABINET --- */
+/* --- THE AUTHENTIC CRT TV CABINET --- */
 .monitor-frame {
-    width: 95vw;
-    max-width: 900px;
-    aspect-ratio: 1.33 / 1;
-    background: #1a1a1a;
+    width: 90vw;
+    max-width: 950px;
+    aspect-ratio: 1.25 / 1;
+    background: var(--tv-bezel-main);
     border-radius: 120px;
-    padding: 60px;
+    padding: 50px;
     box-shadow:
-        0 50px 150px rgba(0, 0, 0, 1),
-        inset 0 10px 20px rgba(255, 255, 255, 0.1),
-        inset 40px 40px 80px rgba(0, 0, 0, 0.8);
+        0 100px 100px -50px rgba(0, 0, 0, 0.8),
+        inset 0 -15px 30px rgba(0, 0, 0, 0.4),
+        inset 0 15px 30px rgba(255, 255, 255, 0.2);
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    /* Complex gradients for that plastic TV look */
+    background: radial-gradient(circle at 50% -20%, var(--tv-bezel-light) 0%, var(--tv-bezel-main) 60%, var(--tv-bezel-dark) 100%);
 }
 
-/* Bezel inner curve */
-.monitor-frame::before {
+/* Inner Bezel Depth */
+.monitor-frame::after {
     content: '';
     position: absolute;
-    inset: 30px;
-    border-radius: 90px;
-    background: linear-gradient(135deg, #2a2a2a, #000);
+    inset: 20px;
+    border-radius: 100px;
+    border: 8px solid #333;
+    pointer-events: none;
     box-shadow: inset 0 0 40px #000;
-    z-index: -1;
 }
 
 .screen {
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 50% 30%, var(--sky-light) 0%, var(--sky-mid) 100%);
+    background-color: var(--sky-color);
     border-radius: 80px;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 40px 0;
-    border: 20px solid #000;
-    box-shadow:
-        inset 0 0 100px rgba(0, 0, 0, 0.5),
-        0 0 20px rgba(255, 255, 255, 0.05);
+    text-align: center;
+    border: 12px solid #000;
     animation: crt-flicker 0.1s infinite alternate;
+    box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.3);
 }
 
-/* --- PIXEL CLOUD SYSTEM --- */
+/* --- THE PIXEL CLOUDS (AUTHENTIC JAGGED EDGES) --- */
 .pixel-clouds {
     position: absolute;
     inset: 0;
@@ -82,156 +81,167 @@
     z-index: 1;
 }
 
-.cloud-bank-bottom {
+/* We create jagged edges using a repeating gradient trick */
+.cloud-bank-detailed {
     position: absolute;
-    bottom: -40px;
-    width: 120%;
-    height: 250px;
+    bottom: -10%;
     left: -10%;
+    width: 120%;
+    height: 70%;
     background: white;
-    filter: drop-shadow(0 -4px 0 #b0c9d9);
-    /* The "Pixel" jagged edge effect */
-    -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
+    /* This creates the jagged "steps" automatically */
+    mask-image:
+        radial-gradient(circle at 20% 100%, black 20%, transparent 20.5%),
+        radial-gradient(circle at 40% 90%, black 25%, transparent 25.5%),
+        radial-gradient(circle at 60% 95%, black 22%, transparent 22.5%),
+        radial-gradient(circle at 80% 85%, black 28%, transparent 28.5%),
+        radial-gradient(circle at 100% 100%, black 20%, transparent 20.5%);
+    -webkit-mask-image:
+        radial-gradient(circle at 20% 100%, black 20%, transparent 20.5%),
+        radial-gradient(circle at 40% 90%, black 25%, transparent 25.5%),
+        radial-gradient(circle at 60% 95%, black 22%, transparent 22.5%),
+        radial-gradient(circle at 80% 85%, black 28%, transparent 28.5%),
+        radial-gradient(circle at 100% 100%, black 20%, transparent 20.5%);
+    /* This adds the pixelation filter */
+    filter: url(#pixelate-clouds);
 }
 
-/* Individual Blocky Clouds */
-.pixel-cloud-entity {
+/* Manual Jagged Cloud Entities */
+.jagged-cloud {
     position: absolute;
     background: white;
-    filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.05));
-}
-
-/* Custom Cloud Shapes to mimic the screenshot */
-.c1 {
     width: 200px;
     height: 80px;
-    left: -20px;
-    bottom: 80px;
-    clip-path: polygon(0 40%, 20% 40%, 20% 20%, 50% 20%, 50% 0, 80% 0, 80% 20%, 100% 20%, 100% 100%, 0 100%);
 }
 
-.c2 {
-    width: 180px;
-    height: 100px;
-    right: -30px;
-    bottom: 120px;
-    clip-path: polygon(0 60%, 20% 60%, 20% 40%, 40% 40%, 40% 20%, 70% 20%, 70% 0, 100% 0, 100% 100%, 0 100%);
+/* Custom Jagged Shape for Clouds */
+.jc1 {
+    top: 20%;
+    left: -30px;
+    transform: scale(1.2);
 }
 
-.c3 {
-    width: 250px;
-    height: 60px;
-    left: 20%;
-    bottom: 40px;
+.jc2 {
+    top: 15%;
+    right: -40px;
+    transform: scale(1.1);
+}
+
+.jagged-cloud::before,
+.jagged-cloud::after {
+    content: '';
+    position: absolute;
+    background: white;
+}
+
+/* The "Step" Effect */
+.step-mask {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, transparent 0%, transparent 95%, var(--sky-color) 95%),
+        linear-gradient(0deg, transparent 0%, transparent 95%, var(--sky-color) 95%);
+    background-size: 8px 8px;
+    /* Pixel grid size */
+    z-index: 2;
 }
 
 /* --- CONTENT --- */
 .landing-content {
     position: relative;
     z-index: 10;
-    width: 100%;
-}
-
-.screen-top {
-    margin-top: 20px;
 }
 
 .by-text {
     font-family: 'Silkscreen', sans-serif;
-    font-size: 0.8rem;
-    color: var(--pixel-blue-dark);
-    letter-spacing: 2px;
+    font-size: 0.9rem;
+    color: var(--pixel-blue-text);
     margin-bottom: 2px;
+    font-weight: bold;
 }
 
 .intro-word {
     font-family: 'Press Start 2P', cursive;
-    font-size: 2.2rem;
-    color: var(--pixel-blue-light);
+    font-size: 2.5rem;
+    color: var(--pixel-light-blue);
+    margin-bottom: 1rem;
     text-transform: lowercase;
-    margin-bottom: 10px;
-    letter-spacing: -2px;
 }
 
 .main-title {
     font-family: 'Press Start 2P', cursive;
-    font-size: 5.5rem;
-    color: var(--pixel-blue-dark);
-    margin: 20px 0;
+    font-size: 6rem;
+    color: var(--pixel-blue-text);
     line-height: 1;
-    letter-spacing: -4px;
-    /* Blocky shadow for that exact look */
-    filter: drop-shadow(5px 5px 0 #fff);
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(4px 4px 0 white);
 }
 
 .pixel-font-sub {
     font-family: 'Silkscreen', sans-serif;
     font-size: 2.2rem;
     color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 6px;
-    -webkit-text-stroke: 1px var(--pixel-blue-dark);
-}
-
-/* --- THE AUTHENTIC BUTTON --- */
-.screen-bottom {
-    margin-bottom: 30px;
-    z-index: 20;
+    letter-spacing: 5px;
+    margin-bottom: 3rem;
+    -webkit-text-stroke: 1px var(--pixel-blue-text);
 }
 
 .start-btn {
     background: white;
-    border: 4px solid var(--pixel-blue-light);
-    color: var(--pixel-blue-light);
+    border: 4px solid var(--pixel-light-blue);
+    color: var(--pixel-light-blue);
     padding: 12px 40px;
-    font-family: 'VT323', monospace;
-    font-size: 1.8rem;
+    font-family: 'VT323';
+    font-size: 2rem;
     cursor: pointer;
     border-radius: 40px;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
     transition: all 0.1s;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
-    text-transform: none;
 }
 
 .start-btn:hover {
-    background: var(--sky-light);
-    transform: translateY(-2px);
+    background: #f0f0f0;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
 }
 
 .start-btn:active {
     transform: translateY(2px);
-    box-shadow: none;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
 }
 
-/* --- CRT EFFECTS --- */
+/* --- TV OVERLAYS --- */
 .scanlines {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.08) 50%);
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
     background-size: 100% 4px;
     pointer-events: none;
     z-index: 100;
 }
 
-.vignette {
+.screen-bulge {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
     pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.2) 100%);
     z-index: 101;
 }
 
-.glass-reflection {
+.glare-top {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
-    pointer-events: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(rgba(255, 255, 255, 0.15) 0%, transparent 100%);
     z-index: 102;
 }
 
 @keyframes crt-flicker {
     0% {
-        opacity: 0.985;
+        opacity: 0.99;
     }
 
     100% {
