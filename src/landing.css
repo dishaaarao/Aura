@@ -1,20 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Silkscreen&family=Press+Start+2P&display=swap');
 
 :root {
-    --tv-cabinet: #1a1a1a;
-    --tv-bezel: #2e2e2e;
-    --screen-bg: #87ceeb;
-    /* Matched to main assistant sky-blue */
-    --pixel-accent: #ff007a;
-    /* Matched to main assistant pixel-pink */
-    --glow: rgba(255, 0, 122, 0.3);
-    --tv-dark: #0a0a0a;
+    --tv-cabinet: #1f1f1f;
+    --tv-bezel: #2c2c2c;
+    --sky-pale: #d6e9f5;
+    --pixel-blue-dark: #3a54a4;
+    --pixel-blue-light: #5b7cc6;
+    --white: #ffffff;
 }
 
 #view-landing {
     position: fixed;
     inset: 0;
-    background-color: #000;
+    background-color: #0d0d12;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,43 +25,41 @@
     display: none !important;
 }
 
-/* --- THE CRT TV HOUSING (FULL SCREEN) --- */
-.tv-cabinet {
-    width: 100vw;
-    height: 100vh;
+/* --- THE REALISTIC CRT TV CABINET --- */
+.monitor-frame {
+    width: 95vw;
+    max-width: 900px;
+    aspect-ratio: 1.3 / 1;
     background: var(--tv-cabinet);
-    position: relative;
-    box-shadow: inset 0 0 150px #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* Cabinet shading with "sides" feel */
-    background:
-        linear-gradient(90deg, #111 0%, #222 5%, transparent 15%, transparent 85%, #222 95%, #111 100%),
-        radial-gradient(circle at 50% 50%, #2a2a2a 0%, #111 100%);
-}
-
-.tv-bezel-inner {
-    width: 95%;
-    height: 90%;
-    background: #000;
-    border-radius: 100px;
-    padding: 30px;
+    border-radius: 120px;
+    padding: 50px;
     box-shadow:
-        inset 0 0 100px #000,
-        0 0 50px rgba(0, 0, 0, 0.5);
+        0 80px 100px -40px rgba(0, 0, 0, 1),
+        inset 0 10px 20px rgba(255, 255, 255, 0.1),
+        inset 0 -10px 30px rgba(0, 0, 0, 0.8);
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 4px solid #111;
 }
 
-.crt-screen {
+/* Inner Bezel Shading for "Depth" */
+.monitor-frame::after {
+    content: '';
+    position: absolute;
+    inset: 20px;
+    border-radius: 100px;
+    background: linear-gradient(135deg, #333, #111);
+    box-shadow: inset 0 0 60px #000;
+    z-index: 0;
+}
+
+.screen {
     width: 100%;
     height: 100%;
-    /* Layered Dreamy Sky Gradient */
-    background:
-        linear-gradient(to bottom, #87ceeb 0%, #f8ccd4 70%, #ff007a 100%);
-    border-radius: 80px;
+    background: radial-gradient(circle at 50% 30%, #fff 0%, var(--sky-pale) 100%);
+    border-radius: 100px;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -71,179 +67,177 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+    border: 15px solid #000;
+    z-index: 1;
+    /* Barrel Distortion Effect */
+    transform: scale(1.02);
     box-shadow:
-        inset 0 0 150px rgba(0, 0, 0, 0.5),
-        inset 0 0 30px rgba(255, 255, 255, 0.1);
-    animation: flicker 0.15s infinite alternate;
+        inset 0 0 120px rgba(0, 0, 0, 0.5),
+        0 0 10px rgba(255, 255, 255, 0.05);
+    animation: crt-flicker 0.15s infinite alternate;
 }
 
-/* --- PIXEL CLOUDS (AUTHENTIC JAGGED) --- */
-.pixel-clouds-container {
+/* --- THE PIXEL CLOUDS (AUTHENTIC JAGGED) --- */
+.pixel-clouds {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 1;
+    z-index: 2;
 }
 
-.pixel-cloud {
+/* Base cloud styling with those iconic jags */
+.cloud-part {
     position: absolute;
     background: white;
-    filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.05));
-    animation: drift 20s infinite linear;
+    filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.02));
+}
+
+/* Cloud Banks (Left & Right) */
+.cloud-bank-side {
+    width: 300px;
+    height: 400px;
+    background: white;
+    position: absolute;
+    bottom: -50px;
+}
+
+.cloud-bank-side.left {
+    left: -100px;
+    border-radius: 0 100px 0 0;
+}
+
+.cloud-bank-side.right {
+    right: -100px;
+    border-radius: 100px 0 0 0;
+}
+
+/* The Central Upward Cloud */
+.cloud-tower {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    height: 180px;
+    background: white;
+    clip-path: polygon(20% 100%, 30% 60%, 40% 60%, 45% 40%, 55% 40%, 60% 60%, 70% 60%, 80% 100%);
+}
+
+/* Small Drifting Clouds */
+.cloud-drifter {
+    position: absolute;
+    background: white;
+    width: 80px;
+    height: 30px;
+    animation: drift 30s infinite linear;
+}
+
+.pc1 {
+    top: 15%;
+    left: 10%;
+    width: 120px;
+    clip-path: polygon(0 40%, 20% 40%, 30% 0, 70% 0, 80% 40%, 100% 40%, 100% 100%, 0 100%);
+}
+
+.pc2 {
+    top: 10%;
+    right: 15%;
+    width: 150px;
+    clip-path: polygon(0 60%, 30% 60%, 40% 20%, 60% 20%, 70% 60%, 100% 60%, 100% 100%, 0 100%);
 }
 
 @keyframes drift {
     from {
-        transform: translateX(-20px);
+        transform: translateX(-50px);
+        opacity: 0.8;
     }
 
     to {
-        transform: translateX(20px);
+        transform: translateX(50px);
+        opacity: 0.8;
     }
 }
 
-/* DECO STARS FROM MAIN UI */
-.landing-deco-star {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: white;
-    clip-path: polygon(40% 0%, 60% 0%, 60% 40%, 100% 40%, 100% 60%, 60% 60%, 60% 100%, 40% 100%, 40% 60%, 0% 60%, 0% 40%, 40% 40%);
-    opacity: 0.2;
-    animation: pulse-star 3s infinite alternate;
-}
-
-@keyframes pulse-star {
-    from {
-        opacity: 0.1;
-        transform: scale(0.8);
-    }
-
-    to {
-        opacity: 0.4;
-        transform: scale(1.2);
-    }
-}
-
-/* Creating jagged pixel edges with multiple box shadows */
-.pc1 {
-    width: 120px;
-    height: 30px;
-    top: 20%;
-    left: 10%;
-    box-shadow:
-        20px -10px 0 white, 40px -10px 0 white, 60px -10px 0 white,
-        30px -20px 0 white, 50px -20px 0 white,
-        -10px 10px 0 white, 130px 10px 0 white;
-}
-
-.pc2 {
-    width: 150px;
-    height: 40px;
-    top: 15%;
-    right: 12%;
-    box-shadow:
-        20px -15px 0 white, 40px -15px 0 white, 60px -15px 0 white, 80px -15px 0 white,
-        40px -30px 0 white, 60px -30px 0 white;
-}
-
-.cloud-bank-bottom {
-    position: absolute;
-    bottom: -20px;
-    width: 100%;
-    height: 35%;
-    background: white;
-    box-shadow:
-        0 -10px 0 white, -40px -10px 0 white, 40px -10px 0 white,
-        -80px -20px 0 white, 80px -20px 0 white,
-        -120px -30px 0 white, 120px -30px 0 white;
-}
-
-/* --- CONTENT --- */
-.tv-content {
+/* --- CONTENT (1:1 COLOR MATCH) --- */
+.landing-content {
     position: relative;
     z-index: 10;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.by-label {
-    font-size: 1.2rem;
-    color: var(--pixel-blue);
-    letter-spacing: 4px;
+.by-text {
+    font-family: 'Silkscreen', sans-serif;
+    font-size: 0.85rem;
+    color: var(--pixel-blue-dark);
+    letter-spacing: 2px;
     margin-bottom: 5px;
-    opacity: 0.8;
+    font-weight: bold;
 }
 
-.intro-tag {
+.intro-word {
     font-family: 'Press Start 2P', cursive;
-    font-size: 2.2rem;
-    color: var(--pixel-accent);
-    margin-bottom: 20px;
+    font-size: 2.4rem;
+    color: var(--pixel-blue-dark);
     text-transform: lowercase;
+    margin-bottom: 10px;
+    letter-spacing: -2px;
+    opacity: 0.9;
 }
 
-.main-logo {
+.main-title {
     font-family: 'Press Start 2P', cursive;
-    font-size: 8rem;
-    color: var(--pixel-blue);
-    margin-bottom: 1rem;
+    font-size: 6.2rem;
+    color: var(--pixel-blue-dark);
+    margin: 15px 0;
     line-height: 1;
-    text-shadow: 6px 6px 0px rgba(255, 255, 255, 0.4);
+    letter-spacing: -4px;
+    filter: drop-shadow(4px 4px 0 rgba(255, 255, 255, 0.8));
 }
 
-.desc-text {
-    font-size: 2.5rem;
-    color: #fff;
-    background: var(--pixel-blue);
-    padding: 0 15px;
+.pixel-font-sub {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.8rem;
+    color: white;
     text-transform: uppercase;
+    letter-spacing: 2px;
+    filter: drop-shadow(2px 2px 0 var(--pixel-blue-dark));
     margin-bottom: 40px;
 }
 
+/* --- PRESS START BUTTON (PILL STYLE) --- */
 .start-btn {
     background: white;
-    border: 4px solid var(--pixel-accent);
-    color: var(--pixel-accent);
-    padding: 12px 30px;
-    font-family: 'VT323';
-    font-size: 1.8rem;
+    border: 3px solid var(--pixel-blue-dark);
+    color: var(--pixel-blue-dark);
+    padding: 10px 40px;
+    font-family: 'VT323', monospace;
+    font-size: 1.6rem;
     cursor: pointer;
     border-radius: 40px;
-    box-shadow: 0 0 15px var(--glow);
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: pulse-btn 2s infinite;
-}
-
-@keyframes pulse-btn {
-    0% {
-        box-shadow: 0 0 5px var(--glow);
-        transform: scale(1);
-    }
-
-    50% {
-        box-shadow: 0 0 25px var(--glow);
-        transform: scale(1.05);
-    }
-
-    100% {
-        box-shadow: 0 0 5px var(--glow);
-        transform: scale(1);
-    }
+    transition: all 0.1s;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.05);
+    font-weight: bold;
 }
 
 .start-btn:hover {
-    background: #f0f8ff;
-    transform: translateY(-2px);
+    background: var(--sky-pale);
+    transform: scale(1.05);
 }
 
-/* --- CRT OVERLAYS --- */
+.start-btn:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+/* --- OVERLAYS --- */
 .scanlines {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.12) 50%);
-    background-size: 100% 4px;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.08) 50%);
+    background-size: 100% 3px;
     pointer-events: none;
     z-index: 100;
 }
@@ -251,22 +245,25 @@
 .vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.3) 100%);
+    background: radial-gradient(circle at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
     pointer-events: none;
     z-index: 101;
 }
 
-.screen-glare {
+.glass-glare {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
     pointer-events: none;
     z-index: 102;
 }
 
-@keyframes flicker {
+@keyframes crt-flicker {
     0% {
-        opacity: 0.98;
+        opacity: 0.99;
     }
 
     100% {

@@ -25,6 +25,10 @@ body {
   height: 100vh;
 }
 
+.hidden {
+  display: none !important;
+}
+
 #app {
   width: 100%;
   min-height: 100vh;

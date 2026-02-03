@@ -33,7 +33,9 @@ const viewLanding = document.getElementById('view-landing') as HTMLDivElement;
 if (portalStartBtn) {
   portalStartBtn.addEventListener('click', () => {
     sounds.success();
-    viewLanding.classList.add('hidden');
+    if (viewLanding) viewLanding.classList.add('hidden');
+    const app = document.getElementById('app');
+    if (app) app.classList.remove('hidden');
   });
 }
 

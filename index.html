@@ -11,44 +11,39 @@
 </head>
 
 <body>
-    <!-- 1. LANDING VIEW (RETRO CRT TV) -->
+    <!-- 1. LANDING VIEW (THE "TV INTRO" 1:1) -->
     <div id="view-landing">
-        <div class="tv-cabinet">
-            <div class="tv-bezel-inner">
-                <div class="crt-screen">
-                    <!-- OVERLAYS -->
-                    <div class="scanlines"></div>
-                    <div class="vignette"></div>
-                    <div class="screen-glare"></div>
+        <div class="monitor-frame">
+            <div class="screen">
+                <!-- AUTHENTIC TV OVERLAYS -->
+                <div class="vignette"></div>
+                <div class="scanlines"></div>
+                <div class="glass-glare"></div>
 
-                    <!-- PIXEL CLOUDS (JAGGED) -->
-                    <div class="pixel-clouds-container">
-                        <!-- DECO STARS (FROM MAIN UI) -->
-                        <div class="landing-deco-star" style="top: 15%; left: 15%;"></div>
-                        <div class="landing-deco-star" style="bottom: 25%; right: 10%; animation-delay: 1s;"></div>
-                        <div class="landing-deco-star" style="top: 10%; right: 25%; animation-delay: 0.5s;"></div>
+                <!-- CLOUD SCENERY (1:1 MATCH) -->
+                <div class="pixel-clouds">
+                    <div class="cloud-part cloud-bank-side left"></div>
+                    <div class="cloud-part cloud-bank-side right"></div>
+                    <div class="cloud-part cloud-tower"></div>
+                    <div class="cloud-drifter pc1"></div>
+                    <div class="cloud-drifter pc2"></div>
+                </div>
 
-                        <div class="pixel-cloud pc1"></div>
-                        <div class="pixel-cloud pc2"></div>
-                        <div class="cloud-bank-bottom"></div>
-                    </div>
+                <!-- CONTENT (MATCHING SCREENSHOT) -->
+                <div class="landing-content">
+                    <p class="by-text">BY HELICA STD</p>
+                    <p class="intro-word">introducing</p>
+                    <h1 class="main-title">AURA</h1>
+                    <p class="pixel-font-sub">PIXEL VOICE ASSISTANT</p>
 
-                    <!-- CONTENT -->
-                    <div class="tv-content">
-                        <p class="by-label">BY HELICA STD</p>
-                        <p class="intro-tag">introducing</p>
-                        <h1 class="main-logo">AURA</h1>
-                        <p class="desc-text">PIXEL VOICE ASSISTANT</p>
-
-                        <button id="btn-portal-start" class="start-btn">Press Start Button</button>
-                    </div>
+                    <button id="btn-portal-start" class="start-btn">Press Start Button</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 2. APP VIEW (THE ORIGINAL UI - 100% UNTOUCHED) -->
-    <div id="app">
+    <div id="app" class="hidden">
         <!-- Hero Section (Sky) -->
         <header class="hero-section">
             <button id="settingsBtn" class="settings-btn" style="position: absolute; top: 20px; right: 20px;">
