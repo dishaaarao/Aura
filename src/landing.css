@@ -7,8 +7,8 @@
     /* Matched to main assistant sky-blue */
     --pixel-accent: #ff007a;
     /* Matched to main assistant pixel-pink */
-    --pixel-blue: #1d3354;
-    --glow: rgba(255, 255, 255, 0.15);
+    --glow: rgba(255, 0, 122, 0.3);
+    --tv-dark: #0a0a0a;
 }
 
 #view-landing {
@@ -90,6 +90,40 @@
     position: absolute;
     background: white;
     filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.05));
+    animation: drift 20s infinite linear;
+}
+
+@keyframes drift {
+    from {
+        transform: translateX(-20px);
+    }
+
+    to {
+        transform: translateX(20px);
+    }
+}
+
+/* DECO STARS FROM MAIN UI */
+.landing-deco-star {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: white;
+    clip-path: polygon(40% 0%, 60% 0%, 60% 40%, 100% 40%, 100% 60%, 60% 60%, 60% 100%, 40% 100%, 40% 60%, 0% 60%, 0% 40%, 40% 40%);
+    opacity: 0.2;
+    animation: pulse-star 3s infinite alternate;
+}
+
+@keyframes pulse-star {
+    from {
+        opacity: 0.1;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 0.4;
+        transform: scale(1.2);
+    }
 }
 
 /* Creating jagged pixel edges with multiple box shadows */
@@ -177,9 +211,27 @@
     font-family: 'VT323';
     font-size: 1.8rem;
     cursor: pointer;
-    border-radius: 30px;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
-    transition: all 0.1s;
+    border-radius: 40px;
+    box-shadow: 0 0 15px var(--glow);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: pulse-btn 2s infinite;
+}
+
+@keyframes pulse-btn {
+    0% {
+        box-shadow: 0 0 5px var(--glow);
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow: 0 0 25px var(--glow);
+        transform: scale(1.05);
+    }
+
+    100% {
+        box-shadow: 0 0 5px var(--glow);
+        transform: scale(1);
+    }
 }
 
 .start-btn:hover {
