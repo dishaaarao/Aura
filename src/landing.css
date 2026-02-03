@@ -3,7 +3,10 @@
 :root {
     --tv-cabinet: #1a1a1a;
     --tv-bezel: #2e2e2e;
-    --screen-bg: #8bb9d0;
+    --screen-bg: #87ceeb;
+    /* Matched to main assistant sky-blue */
+    --pixel-accent: #ff007a;
+    /* Matched to main assistant pixel-pink */
     --pixel-blue: #1d3354;
     --glow: rgba(255, 255, 255, 0.15);
 }
@@ -143,7 +146,7 @@
 .intro-tag {
     font-family: 'Press Start 2P', cursive;
     font-size: 2.2rem;
-    color: #4a6fa5;
+    color: var(--pixel-accent);
     margin-bottom: 20px;
     text-transform: lowercase;
 }
@@ -168,8 +171,8 @@
 
 .start-btn {
     background: white;
-    border: 4px solid #4a6fa5;
-    color: #4a6fa5;
+    border: 4px solid var(--pixel-accent);
+    color: var(--pixel-accent);
     padding: 12px 30px;
     font-family: 'VT323';
     font-size: 1.8rem;
