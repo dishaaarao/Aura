@@ -1,19 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Silkscreen&family=Press+Start+2P&display=swap');
 
 :root {
-    --sky-blue: #a0d8f0;
-    --pixel-dark-blue: #2a3c8e;
-    --pixel-light-blue: #6482c3;
-    --pixel-white: #ffffff;
-    --monitor-grey: #4a4a4a;
-    --monitor-inner: #1a1a1a;
+    --tv-dark: #121212;
+    --tv-bezel: #2a2a2a;
+    --tv-glass: rgba(255, 255, 255, 0.05);
+    --sky-light: #d6e9f5;
+    --sky-mid: #96bbcf;
+    --pixel-blue-dark: #3a54a4;
+    --pixel-blue-light: #5b7cc6;
 }
 
-/* --- LANDING VIEW WRAPPER --- */
 #view-landing {
     position: fixed;
     inset: 0;
-    background-color: #222;
+    background-color: #000;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -26,43 +26,55 @@
     display: none !important;
 }
 
-/* --- THE AUTHENTIC CRT TV --- */
+/* --- THE REALISTIC CRT TV CABINET --- */
 .monitor-frame {
     width: 95vw;
     max-width: 900px;
-    aspect-ratio: 4 / 3;
-    background: linear-gradient(145deg, #555, #333);
-    border-radius: 80px;
-    padding: 40px;
+    aspect-ratio: 1.33 / 1;
+    background: #1a1a1a;
+    border-radius: 120px;
+    padding: 60px;
     box-shadow:
-        0 50px 100px rgba(0, 0, 0, 0.8),
-        inset 0 2px 10px rgba(255, 255, 255, 0.2),
-        inset 0 -5px 20px rgba(0, 0, 0, 0.5);
+        0 50px 150px rgba(0, 0, 0, 1),
+        inset 0 10px 20px rgba(255, 255, 255, 0.1),
+        inset 40px 40px 80px rgba(0, 0, 0, 0.8);
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 4px solid #444;
+}
+
+/* Bezel inner curve */
+.monitor-frame::before {
+    content: '';
+    position: absolute;
+    inset: 30px;
+    border-radius: 90px;
+    background: linear-gradient(135deg, #2a2a2a, #000);
+    box-shadow: inset 0 0 40px #000;
+    z-index: -1;
 }
 
 .screen {
     width: 100%;
     height: 100%;
-    background-color: var(--sky-blue);
-    border-radius: 60px;
+    background: radial-gradient(circle at 50% 30%, var(--sky-light) 0%, var(--sky-mid) 100%);
+    border-radius: 80px;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    text-align: center;
-    border: 15px solid #111;
-    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
-    animation: crt-flicker 0.15s infinite alternate;
+    padding: 40px 0;
+    border: 20px solid #000;
+    box-shadow:
+        inset 0 0 100px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(255, 255, 255, 0.05);
+    animation: crt-flicker 0.1s infinite alternate;
 }
 
-/* --- PIXEL CLOUDS (SCREEN WRAPPED) --- */
+/* --- PIXEL CLOUD SYSTEM --- */
 .pixel-clouds {
     position: absolute;
     inset: 0;
@@ -70,171 +82,159 @@
     z-index: 1;
 }
 
-/* Creating pixelated clouds using layered box-shadows */
-.cloud-layer {
+.cloud-bank-bottom {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    bottom: -40px;
+    width: 120%;
+    height: 250px;
+    left: -10%;
+    background: white;
+    filter: drop-shadow(0 -4px 0 #b0c9d9);
+    /* The "Pixel" jagged edge effect */
+    -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
 }
 
-/* Base Cloud Shape */
-.pixel-cloud {
+/* Individual Blocky Clouds */
+.pixel-cloud-entity {
     position: absolute;
     background: white;
-    width: 100px;
-    height: 40px;
-    box-shadow:
-        -20px 10px 0 white, 20px 10px 0 white,
-        -40px 20px 0 white, 40px 20px 0 white,
-        0 -10px 0 white;
+    filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.05));
 }
 
+/* Custom Cloud Shapes to mimic the screenshot */
 .c1 {
-    top: 20%;
-    left: 10%;
-    transform: scale(1.5);
-    opacity: 0.8;
+    width: 200px;
+    height: 80px;
+    left: -20px;
+    bottom: 80px;
+    clip-path: polygon(0 40%, 20% 40%, 20% 20%, 50% 20%, 50% 0, 80% 0, 80% 20%, 100% 20%, 100% 100%, 0 100%);
 }
 
 .c2 {
-    top: 15%;
-    right: 15%;
-    transform: scale(1.2);
-    opacity: 0.6;
+    width: 180px;
+    height: 100px;
+    right: -30px;
+    bottom: 120px;
+    clip-path: polygon(0 60%, 20% 60%, 20% 40%, 40% 40%, 40% 20%, 70% 20%, 70% 0, 100% 0, 100% 100%, 0 100%);
 }
 
 .c3 {
-    bottom: 30%;
-    left: 30%;
-    transform: scale(2);
-    opacity: 0.9;
-}
-
-/* Large bottom cloud banks */
-.cloud-bank {
-    position: absolute;
-    bottom: -20px;
-    width: 120%;
-    height: 150px;
-    background: white;
-    left: -10%;
-    box-shadow:
-        0 -20px 0 white,
-        -100px -40px 0 white,
-        100px -40px 0 white,
-        -200px -20px 0 white,
-        200px -20px 0 white;
+    width: 250px;
+    height: 60px;
+    left: 20%;
+    bottom: 40px;
 }
 
 /* --- CONTENT --- */
 .landing-content {
     position: relative;
     z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 100%;
+}
+
+.screen-top {
+    margin-top: 20px;
 }
 
 .by-text {
-    font-size: 1.2rem;
-    color: var(--pixel-dark-blue);
+    font-family: 'Silkscreen', sans-serif;
+    font-size: 0.8rem;
+    color: var(--pixel-blue-dark);
     letter-spacing: 2px;
-    margin-bottom: 5px;
-    font-weight: bold;
+    margin-bottom: 2px;
 }
 
 .intro-word {
-    font-size: 3rem;
-    color: var(--pixel-light-blue);
-    margin-bottom: 15px;
-    font-weight: normal;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.2rem;
+    color: var(--pixel-blue-light);
     text-transform: lowercase;
+    margin-bottom: 10px;
+    letter-spacing: -2px;
 }
 
 .main-title {
-    font-size: 10rem;
-    color: var(--pixel-dark-blue);
-    line-height: 0.8;
-    margin-bottom: 20px;
-    text-shadow: 4px 4px 0px rgba(255, 255, 255, 0.5);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 5.5rem;
+    color: var(--pixel-blue-dark);
+    margin: 20px 0;
+    line-height: 1;
+    letter-spacing: -4px;
+    /* Blocky shadow for that exact look */
+    filter: drop-shadow(5px 5px 0 #fff);
 }
 
 .pixel-font-sub {
-    font-size: 2.5rem;
-    color: white;
+    font-family: 'Silkscreen', sans-serif;
+    font-size: 2.2rem;
+    color: #fff;
     text-transform: uppercase;
-    letter-spacing: 5px;
-    margin-bottom: 40px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 6px;
+    -webkit-text-stroke: 1px var(--pixel-blue-dark);
 }
 
-/* --- PRESS START BUTTON (AUTHENTIC) --- */
-.start-btn {
-    background: white;
-    border: 4px solid var(--pixel-light-blue);
-    color: var(--pixel-light-blue);
-    padding: 10px 30px;
-    font-family: inherit;
-    font-size: 1.8rem;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: all 0.1s;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
-    animation: button-blink 2s infinite;
-}
-
-.start-btn:hover {
-    background: var(--pixel-light-blue);
-    color: white;
-}
-
-.start-btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 transparent;
-}
-
-/* --- SCANLINES & GLARE --- */
-.scanlines {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
-            rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg,
-            rgba(255, 0, 0, 0.02),
-            rgba(0, 255, 0, 0.01),
-            rgba(0, 0, 255, 0.02));
-    background-size: 100% 3px, 3px 100%;
-    pointer-events: none;
+/* --- THE AUTHENTIC BUTTON --- */
+.screen-bottom {
+    margin-bottom: 30px;
     z-index: 20;
 }
 
-.glare {
+.start-btn {
+    background: white;
+    border: 4px solid var(--pixel-blue-light);
+    color: var(--pixel-blue-light);
+    padding: 12px 40px;
+    font-family: 'VT323', monospace;
+    font-size: 1.8rem;
+    cursor: pointer;
+    border-radius: 40px;
+    transition: all 0.1s;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+    text-transform: none;
+}
+
+.start-btn:hover {
+    background: var(--sky-light);
+    transform: translateY(-2px);
+}
+
+.start-btn:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+/* --- CRT EFFECTS --- */
+.scanlines {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
-    z-index: 21;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.08) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    z-index: 101;
+}
+
+.glass-reflection {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+    z-index: 102;
 }
 
 @keyframes crt-flicker {
     0% {
-        opacity: 0.98;
+        opacity: 0.985;
     }
 
     100% {
         opacity: 1;
-    }
-}
-
-@keyframes button-blink {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.8;
     }
 }

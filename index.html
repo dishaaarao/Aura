@@ -15,25 +15,32 @@
     <div id="view-landing">
         <div class="monitor-frame">
             <div class="screen">
+                <!-- TV OVERLAYS -->
+                <div class="vignette"></div>
+                <div class="scanlines"></div>
+                <div class="glass-reflection"></div>
+
                 <!-- CLOUD LAYERS (PIXEL TYPE) -->
                 <div class="pixel-clouds">
-                    <div class="pixel-cloud c1"></div>
-                    <div class="pixel-cloud c2"></div>
-                    <div class="pixel-cloud c3"></div>
-                    <div class="cloud-bank"></div>
+                    <div class="pixel-cloud-entity c1"></div>
+                    <div class="pixel-cloud-entity c2"></div>
+                    <div class="pixel-cloud-entity c3"></div>
+                    <div class="cloud-bank-bottom"></div>
                 </div>
 
-                <div class="glare"></div>
-                <div class="scanlines"></div>
-
-                <!-- CONTENT (MATCHING SCREENSHOT) -->
+                <!-- CONTENT (1:1 MATCH) -->
                 <div class="landing-content">
-                    <p class="by-text">BY HELICA STD</p>
-                    <p class="intro-word">introducing</p>
+                    <div class="screen-top">
+                        <p class="by-text">BY HELICA STD</p>
+                        <p class="intro-word">introducing</p>
+                    </div>
+
                     <h1 class="main-title">AURA</h1>
                     <p class="pixel-font-sub">PIXEL VOICE ASSISTANT</p>
 
-                    <button id="btn-portal-start" class="start-btn">Press Start Button</button>
+                    <div class="screen-bottom">
+                        <button id="btn-portal-start" class="start-btn">Press Start Button</button>
+                    </div>
                 </div>
             </div>
         </div>
