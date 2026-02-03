@@ -27,6 +27,15 @@ const pixelBars = document.querySelectorAll('.pixel-bar');
 const navItems = document.querySelectorAll('.nav-item-strip');
 const sections = document.querySelectorAll('.content-section');
 const historyLogs = document.getElementById('history-logs') as HTMLDivElement;
+const portalStartBtn = document.getElementById('btn-portal-start') as HTMLButtonElement;
+const viewLanding = document.getElementById('view-landing') as HTMLDivElement;
+
+if (portalStartBtn) {
+  portalStartBtn.addEventListener('click', () => {
+    sounds.success();
+    viewLanding.classList.add('hidden');
+  });
+}
 
 // --- State ---
 let isListening = false;
