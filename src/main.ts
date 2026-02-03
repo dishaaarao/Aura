@@ -22,7 +22,6 @@ const chatContainer = document.getElementById('chat-container') as HTMLDivElemen
 const settingsTrigger = document.getElementById('settingsTrigger') as HTMLDivElement;
 const modalOverlay = document.getElementById('modalOverlay') as HTMLDivElement;
 const providerSelect = document.getElementById('providerSelect') as HTMLSelectElement;
-const apiKeyInput = document.getElementById('apiKeyInput') as HTMLInputElement;
 const saveApiKeyBtn = document.getElementById('saveApiKey') as HTMLButtonElement;
 const pixelBars = document.querySelectorAll('.pixel-bar');
 const navItems = document.querySelectorAll('.nav-item-strip');
@@ -32,7 +31,6 @@ const historyLogs = document.getElementById('history-logs') as HTMLDivElement;
 // --- State ---
 let isListening = false;
 let conversationHistory: ChatMessage[] = [];
-let apiKey = localStorage.getItem('aura_api_key') || '';
 let provider: AIProvider = (localStorage.getItem('aura_provider') as AIProvider) || 'gemini';
 
 // --- Navigation Logic ---
@@ -176,7 +174,7 @@ async function handleFinalTranscript(text: string) {
       content: `[SYSTEM CONTEXT] The current local time is ${new Date().toLocaleString()}. Provide this if asked.`
     };
 
-    const aiResult = await getAIResponse([...conversationHistory, timeContext], apiKey, provider);
+    const aiResult = await getAIResponse([...conversationHistory, timeContext], '', provider);
     const aiResponse = aiResult.text;
 
     const loader = document.getElementById(loadingId);
@@ -243,7 +241,6 @@ function speak(text: string) {
 }
 
 function showModal() {
-  apiKeyInput.value = apiKey;
   providerSelect.value = provider;
   modalOverlay.style.display = 'flex';
   sounds.click();
@@ -270,10 +267,8 @@ modalOverlay.addEventListener('click', (e) => {
 });
 
 saveApiKeyBtn.addEventListener('click', () => {
-  apiKey = apiKeyInput.value.trim();
   provider = providerSelect.value as AIProvider;
 
-  localStorage.setItem('aura_api_key', apiKey);
   localStorage.setItem('aura_provider', provider);
 
   hideModal();
