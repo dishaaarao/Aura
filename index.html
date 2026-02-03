@@ -11,43 +11,32 @@
 </head>
 
 <body>
-    <!-- 1. LANDING VIEW (THE "FIRST PAGE" - CRT TV STYLE) -->
-    <!-- 1. LANDING VIEW (AUTHENTIC CRT TV) -->
+    <!-- 1. LANDING VIEW (RETRO CRT TV) -->
     <div id="view-landing">
-        <!-- SVG FILTER FOR PIXELATED CLOUDS -->
-        <svg style="visibility: hidden; position: absolute;" width="0" height="0">
-            <filter id="pixelate-clouds" x="0" y="0">
-                <feFlood x="4" y="4" height="4" width="4" />
-                <feComposite width="8" height="8" />
-                <feTile result="a" />
-                <feComposite in="SourceGraphic" in2="a" operator="in" />
-                <feMorphology operator="dilate" radius="1.5" />
-            </filter>
-        </svg>
+        <div class="tv-cabinet">
+            <div class="tv-bezel-inner">
+                <div class="crt-screen">
+                    <!-- OVERLAYS -->
+                    <div class="scanlines"></div>
+                    <div class="vignette"></div>
+                    <div class="screen-glare"></div>
 
-        <div class="monitor-frame">
-            <div class="screen">
-                <!-- TV OVERLAYS -->
-                <div class="glare-top"></div>
-                <div class="scanlines"></div>
-                <div class="screen-bulge"></div>
-                <div class="step-mask"></div>
+                    <!-- PIXEL CLOUDS (JAGGED) -->
+                    <div class="pixel-clouds-container">
+                        <div class="pixel-cloud pc1"></div>
+                        <div class="pixel-cloud pc2"></div>
+                        <div class="cloud-bank-bottom"></div>
+                    </div>
 
-                <!-- CLOUD LAYERS (AUTHENTIC JAGGED) -->
-                <div class="pixel-clouds">
-                    <div class="jagged-cloud jc1"></div>
-                    <div class="jagged-cloud jc2"></div>
-                    <div class="cloud-bank-detailed"></div>
-                </div>
+                    <!-- CONTENT -->
+                    <div class="tv-content">
+                        <p class="by-label">BY HELICA STD</p>
+                        <p class="intro-tag">introducing</p>
+                        <h1 class="main-logo">AURA</h1>
+                        <p class="desc-text">PIXEL VOICE ASSISTANT</p>
 
-                <!-- CONTENT -->
-                <div class="landing-content">
-                    <p class="by-text">BY HELICA STD</p>
-                    <p class="intro-word">introducing</p>
-                    <h1 class="main-title">AURA</h1>
-                    <p class="pixel-font-sub">PIXEL VOICE ASSISTANT</p>
-
-                    <button id="btn-portal-start" class="start-btn">Press Start Button</button>
+                        <button id="btn-portal-start" class="start-btn">Press Start Button</button>
+                    </div>
                 </div>
             </div>
         </div>
