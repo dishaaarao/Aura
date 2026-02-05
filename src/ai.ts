@@ -19,8 +19,9 @@ export async function getAIResponse(
     _apiKey: string, // Kept for signature compatibility but ignored (backend handles keys)
     provider: AIProvider = 'gemini'
 ): Promise<AIResponse> {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
     try {
-        const response = await fetch('http://localhost:3000/api/chat', {
+        const response = await fetch(`${backendUrl}/api/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
