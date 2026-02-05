@@ -110,11 +110,20 @@ async function getOpenAIResponse(messages: any[], apiKey: string) {
 // Routes
 app.post('/api/chat', async (req: Request, res: Response) => {
     const { messages, provider } = req.body;
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        return res.status(400).json({ error: 'Messages are required.' });
+    }
+
     const lastUserMessage = messages[messages.length - 1].content;
 
     try {
-        // 1. Save User Message to Postgres
-        await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['user', lastUserMessage]);
+        // 1. Save User Message to Postgres (Optional, don't crash if DB fails)
+        try {
+            await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['user', lastUserMessage]);
+        } catch (dbErr) {
+            console.warn('⚠️ Database save failed:', dbErr);
+        }
 
         // 2. Get AI Response
         let aiText = '';
@@ -122,7 +131,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
             : provider === 'groq' ? process.env.GROQ_API_KEY
                 : process.env.OPENAI_API_KEY;
 
-        if (!apiKey) throw new Error(`API Key for ${provider} is not configured on server.`);
+        if (!apiKey) throw new Error(`API Key for ${provider} is not configured on the server.`);
 
         if (provider === 'gemini') {
             aiText = await getGeminiResponse(messages, apiKey);
@@ -131,6 +140,8 @@ app.post('/api/chat', async (req: Request, res: Response) => {
         } else {
             aiText = await getOpenAIResponse(messages, apiKey);
         }
+
+        if (!aiText) throw new Error("Received empty response from AI provider.");
 
         // SMART PARSER: Extract only the natural language, removing accidental JSON
         let finalText = aiText;
@@ -149,18 +160,22 @@ app.post('/api/chat', async (req: Request, res: Response) => {
             }
         } catch (e) {
             // Fallback: strip everything starting from the first curly brace
-            finalText = aiText.split('{')[0].trim() || aiText;
+            finalText = (aiText && aiText.split('{')[0]) ? aiText.split('{')[0].trim() : (aiText || "I AM SORRY, I ENCOUNTERED A PARSING ERROR.");
         }
 
         finalText = finalText.toUpperCase();
 
-        // 3. Save AI Message to Postgres
-        await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['assistant', finalText]);
+        // 3. Save AI Message to Postgres (Optional)
+        try {
+            await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['assistant', finalText]);
+        } catch (dbErr) {
+            console.warn('⚠️ Database save failed:', dbErr);
+        }
 
         res.json({ text: finalText });
     } catch (error: any) {
-        console.error('Server AI Error:', error);
-        res.status(500).json({ error: error.message });
+        console.error('❌ Server AI Error:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
     }
 });
 

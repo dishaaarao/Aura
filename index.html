@@ -6,44 +6,11 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AURA | PIXEL VOICE ASSISTANT</title>
-    <!-- LANDING STYLES (Scoped) -->
-    <link rel="stylesheet" href="/src/landing.css">
 </head>
 
 <body>
-    <!-- 1. LANDING VIEW (THE "TRUE" INTRO) -->
-    <div id="view-landing">
-        <div class="monitor-frame">
-            <div class="screen">
-                <!-- TV OVERLAYS -->
-                <div class="vignette"></div>
-                <div class="scanlines"></div>
-                <div class="top-flare"></div>
-
-                <!-- CLOUD SCENERY -->
-                <div class="pixel-clouds">
-                    <div class="cloud-entity cloud-bank-left"></div>
-                    <div class="cloud-entity cloud-bank-right"></div>
-                    <div class="cloud-entity cloud-central-mass"></div>
-                    <div class="floating-cloud f1"></div>
-                    <div class="floating-cloud f2"></div>
-                </div>
-
-                <!-- CONTENT -->
-                <div class="landing-content">
-                    <p class="by-label">BY HELICA STD</p>
-                    <p class="intro-text">introducing</p>
-                    <h1 class="aura-title">AURA</h1>
-                    <p class="pixel-sub">PIXEL VOICE ASSISTANT</p>
-
-                    <button id="btn-portal-start" class="start-btn">Press Start Button</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. APP VIEW (THE ORIGINAL UI - 100% UNTOUCHED) -->
-    <div id="app" class="hidden">
+    <!-- 1. APP VIEW -->
+    <div id="app">
         <!-- Hero Section (Sky) -->
         <header class="hero-section">
             <button id="settingsBtn" class="settings-btn" style="position: absolute; top: 20px; right: 20px;">
