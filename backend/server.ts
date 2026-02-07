@@ -9,13 +9,26 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// 1. Request Logger (Debug)
+app.use((req: Request, res: Response, next) => {
+    console.log(`👉 [${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
+
+// 2. Permissive CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL || '*', // Allow specific frontend in production
-    methods: ['GET', 'POST'],
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.options('*', cors()); // Handle preflight requests
+
 app.use(express.json());
+
+// 3. Health Check
+app.get('/', (req: Request, res: Response) => {
+    res.json({ status: 'online', version: '2.0.0', message: 'Aura Backend is Ready' });
+});
 
 // PostgreSQL Connection
 const pool = new Pool({
