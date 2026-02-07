@@ -40,7 +40,7 @@ export async function getAIResponse(
         const data = await response.json();
         return {
             text: data.text,
-            intent: { type: 'conversation' }
+            intent: data.intent || { type: 'conversation' } // Use backend intent
         };
     } catch (error: any) {
         console.error('Frontend AI Error (Backend call):', error);

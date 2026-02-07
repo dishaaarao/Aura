@@ -176,9 +176,27 @@ async function handleFinalTranscript(text: string) {
 
     const aiResult = await getAIResponse([...conversationHistory, timeContext], '', provider);
     const aiResponse = aiResult.text;
+    const intent = aiResult.intent;
 
     const loader = document.getElementById(loadingId);
     if (loader) loader.remove();
+
+    // --- INTENT HANDLING ---
+    if (intent) {
+      console.log("AI INTENT DETECTED:", intent);
+      switch (intent.type) {
+        case 'action':
+          if (intent.value === 'clear' || aiResponse.includes("CLEAR")) {
+            sounds.success();
+            location.reload(); // Simple clear for now
+            return;
+          }
+          break;
+        case 'math':
+          sounds.processing(); // Extra sound for math
+          break;
+      }
+    }
 
     conversationHistory.push({ role: 'assistant', content: aiResponse });
 
