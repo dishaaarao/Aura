@@ -38,9 +38,13 @@ export async function getAIResponse(
         }
 
         const data = await response.json();
+
+        // Handle both simple text and structured JSON responses
+        const aiText = typeof data === 'string' ? data : (data.text || JSON.stringify(data));
+
         return {
-            text: data.text,
-            intent: { type: 'conversation' }
+            text: aiText,
+            intent: data.intent || { type: 'conversation' }
         };
     } catch (error: any) {
         console.error('Frontend AI Error (Backend call):', error);
