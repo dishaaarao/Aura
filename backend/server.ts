@@ -21,7 +21,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.options('*', cors()); // Handle preflight requests
+// app.options('/*', cors()); // Removed to fix Express 5 crash
 
 app.use(express.json());
 

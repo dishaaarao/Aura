@@ -28,11 +28,33 @@ export async function getAIResponse(
     provider: AIProvider = 'gemini'
 ): Promise<AIResponse> {
 
-    // Use provided key or fallback to the hardcoded one if using Gemini
+    // 1. Try Backend First (Railway or Local)
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    if (backendUrl) {
+        try {
+            const res = await fetch(`${backendUrl}/api/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages, provider })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                return {
+                    text: data.text,
+                    intent: { type: 'conversation' }
+                };
+            }
+            console.warn("Backend returned error, falling back to client-side fetch.");
+        } catch (e) {
+            console.error("Backend Connection Error:", e);
+        }
+    }
+
+    // 2. Client-Side Fallback (Logic you already had)
     const effectiveKey = apiKey || (provider === 'gemini' ? DEFAULT_GEMINI_KEY : '');
 
     if (!effectiveKey && provider !== 'gemini') {
-        // If we don't have a key for Groq/OpenAI, we can't do anything
         throw new Error(`MISSING API KEY FOR ${provider.toUpperCase()}`);
     }
 
