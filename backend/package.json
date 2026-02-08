@@ -6,8 +6,8 @@
   "main": "server.ts",
   "scripts": {
     "dev": "nodemon --exec ts-node server.ts",
-    "build": "tsc",
-    "start": "ts-node server.ts",
+    "build": "echo 'No build step needed for tsx'",
+    "start": "npx tsx server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,7 +19,8 @@
     "express": "^5.2.1",
     "pg": "^8.18.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "tsx": "^4.7.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
