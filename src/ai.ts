@@ -33,11 +33,24 @@ export async function getAIResponse(
         });
 
         if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.error || 'Backend Error');
+            let errText = 'Backend Error';
+            try {
+                const errData = await response.json();
+                errText = errData.error || errText;
+            } catch (e) {
+                // If not JSON, probably an HTML error page (404/500)
+                errText = await response.text();
+            }
+            throw new Error(errText);
         }
 
-        const data = await response.json();
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            // If valid 200 OK but not JSON (rare), just read as text
+            data = await response.text();
+        }
         console.log("DEBUG: AI Response Data:", data);
 
         // BULLETPROOF: Handle any shape the backend throws at us
