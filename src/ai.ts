@@ -1,3 +1,4 @@
+
 export interface ChatMessage {
     role: 'user' | 'assistant' | 'system';
     content: string;
@@ -13,71 +14,113 @@ export interface AIResponse {
     };
 }
 
-// THE NEW POWERFUL BACKEND CONNECTION
+const SYSTEM_PROMPT = `You are AURA, a retro pixel-style voice assistant. 
+Your personality: Friendly, robotic but warm. Always respond in ALL-CAPS.
+You will receive [SYSTEM CONTEXT] messages containing the current time and date. Use that information to answer time-related questions accurately.
+Keep responses concise and natural for speech.`;
+
+// FALLBACK KEYS (Restoring from your provided keys)
+const DEFAULT_GEMINI_KEY = "AIzaSyA2xc4k7C8TpcZym_sZABBszLFAMHKe_Fg";
+
 export async function getAIResponse(
     messages: ChatMessage[],
-    _apiKey: string, // Kept for signature compatibility but ignored (backend handles keys)
+    apiKey: string,
     provider: AIProvider = 'gemini'
 ): Promise<AIResponse> {
-    const backendUrl = 'https://aura-production-b6d5.up.railway.app'; // DIRECT CONNECTION
+
+    // Use provided key or fallback to the hardcoded one if using Gemini
+    const effectiveKey = apiKey || (provider === 'gemini' ? DEFAULT_GEMINI_KEY : '');
+
+    if (!effectiveKey && provider !== 'gemini') {
+        // If we don't have a key for Groq/OpenAI, we can't do anything
+        throw new Error(`MISSING API KEY FOR ${provider.toUpperCase()}`);
+    }
+
+    let textResponse = "";
+
     try {
-        const response = await fetch(`${backendUrl}/api/chat`, {
+        if (provider === 'gemini') {
+            textResponse = await fetchGemini(messages, effectiveKey);
+        } else if (provider === 'groq') {
+            textResponse = await fetchGroq(messages, effectiveKey);
+        } else {
+            textResponse = await fetchOpenAI(messages, effectiveKey);
+        }
+    } catch (error: any) {
+        console.error("AI Fetch Error:", error);
+        throw new Error(error.message || "AI CONNECTION FAILED");
+    }
+
+    return {
+        text: textResponse,
+        intent: { type: 'conversation' }
+    };
+}
+
+// --- PROVIDER IMPLEMENTATIONS ---
+
+async function fetchGemini(messages: ChatMessage[], apiKey: string): Promise<string> {
+    const contents = messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+    })).filter(m => m.role !== 'system'); // Gemini handles system via systemInstruction
+
+    // Combine consecutive user/model messages if needed (Logic omitted for simplicity, Gemin usually handles strict turns)
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                messages,
-                provider
+                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                contents: contents
             })
         });
 
         if (!response.ok) {
-            let errText = 'Backend Error';
-            try {
-                const errData = await response.json();
-                errText = errData.error || errText;
-            } catch (e) {
-                // If not JSON, probably an HTML error page (404/500)
-                errText = await response.text();
-            }
-            throw new Error(errText);
+            const err = await response.json();
+            throw new Error(err.error?.message || "Gemini Error");
         }
 
-        let data;
-        try {
-            data = await response.json();
-        } catch (e) {
-            // If valid 200 OK but not JSON (rare), just read as text
-            data = await response.text();
-        }
-        console.log("DEBUG: AI Response Data:", data);
-
-        // BULLETPROOF: Handle any shape the backend throws at us
-        let aiText = "I COULD NOT HEAR YOU PROPERLY.";
-
-        if (typeof data === 'string') {
-            aiText = data;
-        } else if (data && typeof data === 'object') {
-            aiText = data.text || data.response || data.message || JSON.stringify(data);
-        }
-
-        // Clean up accidental JSON strings in the output
-        if (aiText.trim().startsWith('{') && aiText.trim().endsWith('}')) {
-            try {
-                const inner = JSON.parse(aiText);
-                if (inner.text) aiText = inner.text;
-            } catch (e) {
-                // ignore
-            }
-        }
-
-        return {
-            text: aiText,
-            intent: { type: 'conversation' } // Always default to simple conversation
-        };
-    } catch (error: any) {
-        console.error('Frontend AI Error (Backend call):', error);
-        throw error;
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "NO RESPONSE";
+    } catch (e: any) {
+        throw new Error("GEMINI ERROR: " + e.message);
     }
+}
+
+async function fetchGroq(messages: ChatMessage[], apiKey: string): Promise<string> {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+            model: "llama-3.3-70b-versatile"
+        })
+    });
+
+    if (!response.ok) throw new Error("Groq API Error");
+    const data = await response.json();
+    return data.choices[0]?.message?.content || "";
+}
+
+async function fetchOpenAI(messages: ChatMessage[], apiKey: string): Promise<string> {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+            model: "gpt-3.5-turbo"
+        })
+    });
+
+    if (!response.ok) throw new Error("OpenAI API Error");
+    const data = await response.json();
+    return data.choices[0]?.message?.content || "";
 }
