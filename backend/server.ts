@@ -3,8 +3,13 @@ import type { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { Pool } from 'pg';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -205,6 +210,17 @@ app.get('/api/history', async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch history' });
     }
+});
+
+// Serve Static Files from the Frontend build directory
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
+// Catch-all route for SPA (redirect to index.html)
+app.get('*', (req: Request, res: Response, next) => {
+    // If request is for an API route, skip to next handler (though API routes are defined above)
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
