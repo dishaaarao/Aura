@@ -57,24 +57,8 @@ initDB();
 const SYSTEM_PROMPT = `You are AURA, a retro pixel-style voice assistant. 
 Your personality: Friendly, robotic but warm. Always respond in ALL-CAPS.
 You will receive [SYSTEM CONTEXT] messages containing the current time and date. Use that information to answer time-related questions accurately.
-
-CRITICAL: You MUST return a VALID JSON object with this structure:
-{
-  "text": "YOUR RESPONSE TEXT HERE",
-  "intent": {
-    "type": "conversation" | "math" | "repeat" | "time" | "action", // Choose one
-    "value": "optional value" // Only if needed (e.g. the math result)
-  }
-}
-
-INTENT GUIDELINES:
-- "math": Use this if the user asks for a calculation. Compute the result and put it in "value" (as a string).
-  Example: User "What is 2+2?" -> {"text": "THE ANSWER IS 4", "intent": {"type": "math", "value": "4"}}
-- "repeat": Use this if the user asks you to say something specific. Put the exact phrase in "value".
-- "time": Use this for time/date queries.
-- "conversation": Default for general chat.
-
 Keep responses concise and natural for speech.
+CRITICAL: You MUST return a JSON object with a "text" field.
 `;
 
 async function getGeminiResponse(messages: any[], apiKey: string) {
@@ -96,8 +80,7 @@ async function getGeminiResponse(messages: any[], apiKey: string) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                    contents: contents,
-                    generationConfig: { responseMimeType: "application/json" } // Force JSON
+                    contents: contents
                 })
             });
             if (!res.ok) continue;
@@ -118,8 +101,7 @@ async function getGroqResponse(messages: any[], apiKey: string) {
         },
         body: JSON.stringify({
             model: 'llama-3.3-70b-versatile',
-            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-            response_format: { type: "json_object" } // Force JSON
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
         })
     });
     const data: any = await res.json();
@@ -135,8 +117,7 @@ async function getOpenAIResponse(messages: any[], apiKey: string) {
         },
         body: JSON.stringify({
             model: 'gpt-3.5-turbo',
-            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-            response_format: { type: "json_object" } // Force JSON
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
         })
     });
     const data: any = await res.json();
@@ -146,6 +127,8 @@ async function getOpenAIResponse(messages: any[], apiKey: string) {
 // Routes
 app.post('/api/chat', async (req: Request, res: Response) => {
     const { messages, provider } = req.body;
+
+    console.log(`👉 Request: ${provider}, Messages: ${messages?.length}`);
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
         return res.status(400).json({ error: 'Messages are required.' });
@@ -162,7 +145,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
         }
 
         // 2. Get AI Response
-        let aiRawResponse = '';
+        let aiText = '';
         const apiKey = provider === 'gemini' ? process.env.GEMINI_API_KEY
             : provider === 'groq' ? process.env.GROQ_API_KEY
                 : process.env.OPENAI_API_KEY;
@@ -170,39 +153,45 @@ app.post('/api/chat', async (req: Request, res: Response) => {
         if (!apiKey) throw new Error(`API Key for ${provider} is not configured on the server.`);
 
         if (provider === 'gemini') {
-            aiRawResponse = await getGeminiResponse(messages, apiKey);
+            aiText = await getGeminiResponse(messages, apiKey);
         } else if (provider === 'groq') {
-            aiRawResponse = await getGroqResponse(messages, apiKey);
+            aiText = await getGroqResponse(messages, apiKey);
         } else {
-            aiRawResponse = await getOpenAIResponse(messages, apiKey);
+            aiText = await getOpenAIResponse(messages, apiKey);
         }
 
-        if (!aiRawResponse) throw new Error("Received empty response from AI provider.");
+        if (!aiText) throw new Error("Received empty response from AI provider.");
 
-        // 3. Parse JSON Response
-        let parsedResponse: { text: string; intent?: any } = { text: aiRawResponse }; // Default fallback
+        // SMART PARSER: Extract only the natural language, removing accidental JSON
+        let finalText = aiText;
         try {
-            // Remove markdown code blocks if present
-            const cleanJson = aiRawResponse.replace(/```json|```/g, '').trim();
-            parsedResponse = JSON.parse(cleanJson);
+            // Check if there is a JSON block anywhere in the text
+            const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const potentialJson = jsonMatch[0];
+                const cleanJson = potentialJson.replace(/```json|```/g, '').trim();
+                const parsed = JSON.parse(cleanJson);
+                // If it's valid JSON, use the 'text' field. If not, strip the JSON from the string.
+                finalText = (parsed.text || parsed.response || parsed.message || aiText.replace(potentialJson, '').trim());
+            } else {
+                // If no JSON object found, just clean the text of any stray backticks or braces
+                finalText = aiText.replace(/```json|```|\{|\}/g, '').trim();
+            }
         } catch (e) {
-            console.warn("⚠️ Failed to parse AI JSON, falling back to raw text.", e);
-            parsedResponse = { text: aiRawResponse, intent: { type: 'conversation' } };
+            // Fallback: strip everything starting from the first curly brace
+            finalText = (aiText && aiText.split('{')[0]) ? aiText.split('{')[0].trim() : (aiText || "I AM SORRY, I ENCOUNTERED A PARSING ERROR.");
         }
 
-        // Ensure text is uppercase as per persona
-        if (parsedResponse.text) {
-            parsedResponse.text = parsedResponse.text.toUpperCase();
-        }
+        finalText = finalText.toUpperCase();
 
-        // 4. Save AI Message to Postgres
+        // 3. Save AI Message to Postgres (Optional)
         try {
-            await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['assistant', parsedResponse.text]);
+            await pool.query('INSERT INTO messages (role, content) VALUES ($1, $2)', ['assistant', finalText]);
         } catch (dbErr) {
             console.warn('⚠️ Database save failed:', dbErr);
         }
 
-        res.json(parsedResponse);
+        res.json({ text: finalText });
     } catch (error: any) {
         console.error('❌ Server AI Error:', error);
         res.status(500).json({ error: error.message || 'Internal Server Error' });
