@@ -38,13 +38,30 @@ export async function getAIResponse(
         }
 
         const data = await response.json();
+        console.log("DEBUG: AI Response Data:", data);
 
-        // Handle both simple text and structured JSON responses
-        const aiText = typeof data === 'string' ? data : (data.text || JSON.stringify(data));
+        // BULLETPROOF: Handle any shape the backend throws at us
+        let aiText = "I COULD NOT HEAR YOU PROPERLY.";
+
+        if (typeof data === 'string') {
+            aiText = data;
+        } else if (data && typeof data === 'object') {
+            aiText = data.text || data.response || data.message || JSON.stringify(data);
+        }
+
+        // Clean up accidental JSON strings in the output
+        if (aiText.trim().startsWith('{') && aiText.trim().endsWith('}')) {
+            try {
+                const inner = JSON.parse(aiText);
+                if (inner.text) aiText = inner.text;
+            } catch (e) {
+                // ignore
+            }
+        }
 
         return {
             text: aiText,
-            intent: data.intent || { type: 'conversation' }
+            intent: { type: 'conversation' } // Always default to simple conversation
         };
     } catch (error: any) {
         console.error('Frontend AI Error (Backend call):', error);
