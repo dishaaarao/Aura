@@ -28,8 +28,11 @@ export async function getAIResponse(
 ): Promise<AIResponse> {
 
     // 1. Try Backend FIRST
-    // On Vercel, this will automatically call the same domain's /api/chat
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+    // We use a relative path /api/chat which works on Vercel and local dev (via vite proxy or same port)
+    // We only use VITE_BACKEND_URL if it's explicitly set to something other than localhost
+    let backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+    if (backendUrl.includes('localhost')) backendUrl = '';
+
     try {
         const res = await fetch(`${backendUrl}/api/chat`, {
             method: 'POST',
