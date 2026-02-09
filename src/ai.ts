@@ -28,10 +28,15 @@ export async function getAIResponse(
 ): Promise<AIResponse> {
 
     // 1. Try Backend FIRST
-    // We use a relative path /api/chat which works on Vercel and local dev (via vite proxy or same port)
-    // We only use VITE_BACKEND_URL if it's explicitly set to something other than localhost
+    // Determine the backend URL based on environment
     let backendUrl = import.meta.env.VITE_BACKEND_URL || '';
-    if (backendUrl.includes('localhost')) backendUrl = '';
+
+    // If we are on Vercel/Production, we use relative paths (e.g., /api/chat)
+    // If we are on Localhost, we use the full backend URL unless the ports match
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocal || !backendUrl) {
+        backendUrl = ''; // Use relative path in production or if no URL set
+    }
 
     try {
         const res = await fetch(`${backendUrl}/api/chat`, {
