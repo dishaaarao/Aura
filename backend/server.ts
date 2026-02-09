@@ -184,7 +184,8 @@ app.post('/api/chat', async (req: Request, res: Response) => {
             }
         } catch (e) {
             // Fallback: strip everything starting from the first curly brace
-            finalText = (aiText && aiText.split('{')[0]) ? aiText.split('{')[0].trim() : (aiText || "I AM SORRY, I ENCOUNTERED A PARSING ERROR.");
+            const beforeBrace = aiText.split('{')[0];
+            finalText = beforeBrace?.trim() || aiText || "I AM SORRY, I ENCOUNTERED A PARSING ERROR.";
         }
 
         finalText = finalText.toUpperCase();
