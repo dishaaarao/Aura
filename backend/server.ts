@@ -217,10 +217,10 @@ app.get('/api/history', async (req: Request, res: Response) => {
 const distPath = path.join(__dirname, '../dist');
 app.use(express.static(distPath));
 
-// Catch-all route for SPA (redirect to index.html)
-app.get('*', (req: Request, res: Response, next) => {
-    // If request is for an API route, skip to next handler (though API routes are defined above)
-    if (req.path.startsWith('/api')) return next();
+// Catch-all middleware for SPA (redirect to index.html)
+app.use((req: Request, res: Response, next) => {
+    // If request is for an API route, skip (though API routes are defined above)
+    if (req.originalUrl.startsWith('/api')) return next();
     res.sendFile(path.join(distPath, 'index.html'));
 });
 
